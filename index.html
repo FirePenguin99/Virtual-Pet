@@ -2,15 +2,46 @@
 <meta charset="utf-8">
 <title>Virtual Pet</title>
 
+<style> 
+    svg{
+        border: 0.25em;
+        border-style: dashed;
+    }
+
+    .body{
+        fill: none;
+        stroke: black;
+    }
+
+    #pet{
+        display: flex;
+        flex-direction: row;
+    }
+</style>
+
 <body>
 <script src="script_events_2.js"></script>
 
-<button id="plusFood"> Press to feed </button>
-<button id="plusClean"> Press to clean </button>
-<button id="plusSleep"> Press to put to sleep </button>
-<button id="subFood"> Press to starve </button>
-<button id="subClean"> Press to make dirty </button>
-<button id="subSleep"> Press to tire </button>
+<div id="pet">
+    <svg width="250" height = "250">
+        <circle cx="125" cy="175" r="60" class="body" />
+        <circle cx="125" cy="100" r="40" class="body" />
+    </svg>
+    <div>
+        <p id="foodDisplay"> food: </p>
+        <p id="cleanlinessDisplay"> cleanliness: </p>
+        <p id="sleepDisplay"> energy: </p>
+        <p id="happinessDisplay"> happiness: </p>
+    </div>
+</div>
 
+<nav>
+    <button id="plusFood"> Press to feed </button>
+    <button id="plusClean"> Press to clean </button>
+    <button id="plusSleep"> Press to put to sleep </button>
+    <button id="subFood"> Press to starve </button>
+    <button id="subClean"> Press to make dirty </button>
+    <button id="subSleep"> Press to tire </button>
+</nav>
 
 </body>
