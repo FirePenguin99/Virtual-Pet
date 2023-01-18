@@ -6,11 +6,8 @@
     svg{
         border: 0.25em;
         border-style: dashed;
-    }
-
-    .body{
-        fill: none;
-        stroke: black;
+        margin: 0.25em;
+        border-color: crimson;
     }
 
     #pet{
@@ -24,10 +21,35 @@
 
 <div id="pet">
     <svg width="250" height = "250">
-        <circle cx="125" cy="175" r="60" class="body" />
-        <circle cx="125" cy="100" r="40" class="body" />
+        <defs>
+            <g id="cat">
+                <circle cx="125" cy="175" r="60" />
+                <circle cx="125" cy="100" r="40" />
+        
+                <g id="ear">
+                    <polyline points="115,61 80,40 90,80"/>
+                </g>  
+
+                <use href="#ear" x="-250" y="0" transform="scale(-1,1)"/>
+            </g>
+        </defs>
+
+        <use href ="#cat" class="cat_line"/>
+
+        <path d="M115,61 
+                L80,40 90,80 
+                A2,0.75 90 1 0 95 125 
+                A1,2.5 1 1 0 155 125 
+                
+                " 
+
+                
+            stroke="black" fill="orange" />
     </svg>
+    
+    
     <div>
+        <p id="nameDisplay"> name: </p>
         <p id="foodDisplay"> food: </p>
         <p id="cleanlinessDisplay"> cleanliness: </p>
         <p id="sleepDisplay"> energy: </p>
@@ -42,6 +64,8 @@
     <button id="subFood"> Press to starve </button>
     <button id="subClean"> Press to make dirty </button>
     <button id="subSleep"> Press to tire </button>
+
+    <button id="nameChange"> Press to swap pets </button>
 </nav>
 
 </body>

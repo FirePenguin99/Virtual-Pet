@@ -52,31 +52,72 @@ function increaseSleep (obj){
 function calculateHappiness (obj){
     obj.happiness = (obj.food + obj.cleanliness + obj.sleep)/3;
     console.log(obj.happiness);
+    document.querySelector('#happinessDisplay').textContent = "happiness: " + obj.happiness;
 }
+
+let currentPet;
+//use a list to implement multiple pets. Use .append with constructor
 
 function startGame(){
     
     console.log("Welcome to your Virtual Pet!")
     let pet1 = new Pet("goob", "cat");
-
     console.log("Say hello to your new " + pet1.type + ": " + pet1.name + "!")
 
-    const feedButton = document.querySelector('#plusFood');
-    feedButton.addEventListener('click', ()=>increaseFood(pet1));
-    const cleanButton = document.querySelector('#plusClean');
-    cleanButton.addEventListener('click', ()=>increaseCleanliness(pet1));
-    const sleepButton = document.querySelector('#plusSleep');
-    sleepButton.addEventListener('click', ()=>increaseSleep(pet1));
-    const starveButton = document.querySelector('#subFood');
-    starveButton.addEventListener('click', ()=>reduceFood(pet1));
-    const dirtyButton = document.querySelector('#subClean');
-    dirtyButton.addEventListener('click', ()=>reduceCleanliness(pet1));
-    const tireButton = document.querySelector('#subSleep');
-    tireButton.addEventListener('click', ()=>reduceSleep(pet1));
+    currentPet = pet1;
+    console.log(currentPet.name);
+
+    let pet2 = new Pet("gewb", "dog");
+    console.log("Say hello to your new " + pet2.type + ": " + pet2.name + "!")
+
+    currentPet = pet2;
+    console.log(currentPet.name);
+
+    //decreaseStatsInterval();
 }
 
 window.addEventListener('load', ()=>{
 
+    addListeners();
     startGame();
 
 });
+
+function addListeners(){
+    const feedButton = document.querySelector('#plusFood');
+    feedButton.addEventListener('click', ()=>increaseFood(currentPet));
+    const cleanButton = document.querySelector('#plusClean');
+    cleanButton.addEventListener('click', ()=>increaseCleanliness(currentPet));
+    const sleepButton = document.querySelector('#plusSleep');
+    sleepButton.addEventListener('click', ()=>increaseSleep(currentPet));
+    const starveButton = document.querySelector('#subFood');
+    starveButton.addEventListener('click', ()=>reduceFood(currentPet));
+    const dirtyButton = document.querySelector('#subClean');
+    dirtyButton.addEventListener('click', ()=>reduceCleanliness(currentPet));
+    const tireButton = document.querySelector('#subSleep');
+    tireButton.addEventListener('click', ()=>reduceSleep(currentPet));
+
+    const petImage = document.querySelector('#pet');
+    petImage.addEventListener('click', logToConsole);
+
+    const nameButton = document.querySelector('#nameChange');
+    nameButton.addEventListener('click', changeName);
+}
+
+//use for loop in pets list to decrease the stats
+function decreaseStatsInterval(){
+    reduceFood(currentPet);
+    reduceCleanliness(currentPet);
+    reduceSleep(currentPet);
+    calculateHappiness(currentPet);
+
+    setTimeout(decreaseStatsInterval, 5000);
+}
+
+function logToConsole(){
+    console.log("Clicked");
+}
+
+function changeName (){
+    document.querySelector('#nameDisplay').textContent = "food: " + currentPet.name;
+}
