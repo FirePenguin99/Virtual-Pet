@@ -58,20 +58,27 @@ function calculateHappiness (obj){
 let currentPet;
 //use a list to implement multiple pets. Use .append with constructor
 
+let bugToSVG = [
+            ];
+
 function startGame(){
     
     console.log("Welcome to your Virtual Pet!")
     let pet1 = new Pet("goob", "cat");
     console.log("Say hello to your new " + pet1.type + ": " + pet1.name + "!")
-
+    bugToSVG.push(["bug1", pet1]); //equates the tag of the SVG element to the object its connected to. This will be done dynamically later
+    
     currentPet = pet1;
     console.log(currentPet.name);
 
     let pet2 = new Pet("gewb", "dog");
     console.log("Say hello to your new " + pet2.type + ": " + pet2.name + "!")
+    bugToSVG.push(["bug2", pet2]); //equates the tag of the SVG element to the object its connected to. This will be done dynamically later
 
     currentPet = pet2;
     console.log(currentPet.name);
+
+    console.log(bugToSVG); //eheck in console if array is filled properly
 
     //decreaseStatsInterval();
 }
@@ -118,7 +125,14 @@ function decreaseStatsInterval(){
 }
 
 function logToConsole(element){
-    console.log("Clicked on " + element.target.id);
+    const selectedId = element.target.id
+    
+    console.log("Clicked on " + selectedId);
+    for(const bug in bugToSVG){ //loop through array,
+        if (selectedId == bugToSVG[bug][0]){ //until the clicked on SVG id matches one in the array.
+            console.log("you just clicked on " + bugToSVG[bug][1].name + "!"); //log the found bug object's name attribute.
+        }
+    }
 }
 
 function changeName (){
