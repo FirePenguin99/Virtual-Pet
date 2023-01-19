@@ -97,11 +97,14 @@ function addListeners(){
     const tireButton = document.querySelector('#subSleep');
     tireButton.addEventListener('click', ()=>reduceSleep(currentPet));
 
-    const petImage = document.querySelector('#pet');
-    petImage.addEventListener('click', logToConsole);
-
     const nameButton = document.querySelector('#nameChange');
     nameButton.addEventListener('click', changeName);
+
+    const bug1 = document.querySelector('#bug1');
+    bug1.addEventListener('click', logToConsole);
+
+    const bug2 = document.querySelector('#bug2');
+    bug2.addEventListener('click', logToConsole);
 }
 
 //use for loop in pets list to decrease the stats
