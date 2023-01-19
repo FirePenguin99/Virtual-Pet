@@ -101,10 +101,10 @@ function addListeners(){
     nameButton.addEventListener('click', changeName);
 
     const bug1 = document.querySelector('#bug1');
-    bug1.addEventListener('click', logToConsole);
+    bug1.addEventListener('click', (e)=>logToConsole(e));
 
     const bug2 = document.querySelector('#bug2');
-    bug2.addEventListener('click', logToConsole);
+    bug2.addEventListener('click', (e)=>logToConsole(e));
 }
 
 //use for loop in pets list to decrease the stats
@@ -117,8 +117,8 @@ function decreaseStatsInterval(){
     setTimeout(decreaseStatsInterval, 5000);
 }
 
-function logToConsole(){
-    console.log("Clicked");
+function logToConsole(element){
+    console.log("Clicked on " + element.target.id);
 }
 
 function changeName (){
