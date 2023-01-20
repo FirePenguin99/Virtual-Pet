@@ -19,40 +19,40 @@ function Pet(name, type){
 
 function reduceFood (obj){
     obj.food -= 2;
-    console.log("food: " + obj.food);
-    document.querySelector('#foodDisplay').textContent = "food: " + obj.food;
+    //console.log("food: " + obj.food);
+    document.querySelector('#foodDisplay').textContent = "food: " + currentPet.food;
 }
 function reduceCleanliness (obj){
     obj.cleanliness -= 2;
-    console.log("cleanliness: " + obj.cleanliness);
-    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + obj.cleanliness;
+    //console.log("cleanliness: " + obj.cleanliness);
+    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentPet.cleanliness;
 }
 function reduceSleep (obj){
     obj.sleep -= 2;
-    console.log("sleep: " + obj.sleep);
-    document.querySelector('#sleepDisplay').textContent = "sleep: " + obj.sleep;
+    //console.log("sleep: " + obj.sleep);
+    document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
 }
 
 function increaseFood (obj){
     obj.food += 2;
-    console.log("food: " + obj.food);
-    document.querySelector('#foodDisplay').textContent = "food: " + obj.food;
+    //console.log("food: " + obj.food);
+    document.querySelector('#foodDisplay').textContent = "food: " + currentPet.food;
 }
 function increaseCleanliness (obj){
     obj.cleanliness += 2;
-    console.log("cleanliness: " + obj.cleanliness);
-    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + obj.cleanliness;
+    //console.log("cleanliness: " + obj.cleanliness);
+    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentPet.cleanliness;
 }
 function increaseSleep (obj){
     obj.sleep += 2;
-    console.log("sleep: " + obj.sleep);
-    document.querySelector('#sleepDisplay').textContent = "sleep: " + obj.sleep;
+    //console.log("sleep: " + obj.sleep);
+    document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
 }
 
 function calculateHappiness (obj){
     obj.happiness = (obj.food + obj.cleanliness + obj.sleep)/3;
-    console.log(obj.happiness);
-    document.querySelector('#happinessDisplay').textContent = "happiness: " + obj.happiness;
+    //console.log(obj.happiness);
+    document.querySelector('#happinessDisplay').textContent = "happiness: " + currentPet.happiness;
 }
 
 let currentPet;
