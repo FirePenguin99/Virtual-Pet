@@ -80,7 +80,7 @@ function startGame(){
 
     console.log(bugToSVG); //eheck in console if array is filled properly
 
-    //decreaseStatsInterval();
+    decreaseStatsInterval();
 }
 
 window.addEventListener('load', ()=>{
@@ -104,14 +104,11 @@ function addListeners(){
     const tireButton = document.querySelector('#subSleep');
     tireButton.addEventListener('click', ()=>reduceSleep(currentPet));
 
-    const nameButton = document.querySelector('#nameChange');
-    nameButton.addEventListener('click', changeName);
-
     const bug1 = document.querySelector('#bug1');
-    bug1.addEventListener('click', (e)=>logToConsole(e));
+    bug1.addEventListener('click', (e)=>switchCurrentPet(e));
 
     const bug2 = document.querySelector('#bug2');
-    bug2.addEventListener('click', (e)=>logToConsole(e));
+    bug2.addEventListener('click', (e)=>switchCurrentPet(e));
 }
 
 //use for loop in pets list to decrease the stats
@@ -135,6 +132,19 @@ function logToConsole(element){
     }
 }
 
-function changeName (){
-    document.querySelector('#nameDisplay').textContent = "food: " + currentPet.name;
+function switchCurrentPet(element){
+    const selectedId = element.target.id
+    
+    //console.log("Clicked on " + selectedId);
+    for(const bug in bugToSVG){ //loop through array,
+        if (selectedId == bugToSVG[bug][0]){ //until the clicked on SVG id matches one in the array.
+            console.log("you just clicked on " + bugToSVG[bug][1].name + "!"); //log the found bug object's name attribute.
+            currentPet = bugToSVG[bug][1];
+        }
+    }
+    //update all the attribute displays to represent the selected pet
+    document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name;
+    document.querySelector('#foodDisplay').textContent = "food: " + currentPet.food;
+    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentPet.cleanliness;
+    document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
 }
