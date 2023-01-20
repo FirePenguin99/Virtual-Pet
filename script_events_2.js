@@ -50,7 +50,7 @@ function increaseSleep (obj){
 }
 
 function calculateHappiness (obj){
-    obj.happiness = (obj.food + obj.cleanliness + obj.sleep)/3;
+    currentPet.happiness = (currentPet.food + currentPet.cleanliness + currentPet.sleep)/3;
     //console.log(obj.happiness);
     document.querySelector('#happinessDisplay').textContent = "happiness: " + currentPet.happiness;
 }
@@ -84,6 +84,8 @@ function startGame(){
     document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name; //upon startup, game never used to display first pets name until the user had clicked on one. this line fixes this.
 
     decreaseStatsInterval();
+
+    createNewCircle();
 }
 
 window.addEventListener('load', ()=>{
@@ -126,17 +128,6 @@ function decreaseStatsInterval(){
     setTimeout(decreaseStatsInterval, 5000);
 }
 
-function logToConsole(element){
-    const selectedId = element.target.id
-    
-    console.log("Clicked on " + selectedId);
-    for(const bug in bugToSVG){ //loop through array,
-        if (selectedId == bugToSVG[bug][0]){ //until the clicked on SVG id matches one in the array.
-            console.log("you just clicked on " + bugToSVG[bug][1].name + "!"); //log the found bug object's name attribute.
-        }
-    }
-}
-
 function switchCurrentPet(element){
     const selectedId = element.target.id
     
@@ -152,4 +143,15 @@ function switchCurrentPet(element){
     document.querySelector('#foodDisplay').textContent = "food: " + currentPet.food;
     document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentPet.cleanliness;
     document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
+}
+
+function createNewCircle(){
+    let newCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); //No idea why i need to use the NS variant of createElement, nor why I need to specifiy a namespace. SVGs may just be that way.
+    newCircle.setAttributeNS(null, "id", "bug3"); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
+    newCircle.setAttributeNS(null, "cx", "175");
+    newCircle.setAttributeNS(null, "cy", "175");
+    newCircle.setAttributeNS(null, "r", "20");
+    
+    const targetDiv = document.querySelector('#canvas'); //find and store where to place the svg in the HTML
+    targetDiv.appendChild(newCircle); //append circle into the HTML, as a child of the SVG element.
 }
