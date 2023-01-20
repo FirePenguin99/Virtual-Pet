@@ -80,6 +80,9 @@ function startGame(){
 
     console.log(bugToSVG); //eheck in console if array is filled properly
 
+
+    document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name; //upon startup, game never used to display first pets name until the user had clicked on one. this line fixes this.
+
     decreaseStatsInterval();
 }
 
@@ -111,12 +114,14 @@ function addListeners(){
     bug2.addEventListener('click', (e)=>switchCurrentPet(e));
 }
 
-//use for loop in pets list to decrease the stats
+//loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
 function decreaseStatsInterval(){
-    reduceFood(currentPet);
-    reduceCleanliness(currentPet);
-    reduceSleep(currentPet);
-    calculateHappiness(currentPet);
+    for(const bug in bugToSVG){
+        reduceFood(bugToSVG[bug][1]);
+        reduceCleanliness(bugToSVG[bug][1]);
+        reduceSleep(bugToSVG[bug][1]);
+        calculateHappiness(bugToSVG[bug][1]);
+    }
 
     setTimeout(decreaseStatsInterval, 5000);
 }
