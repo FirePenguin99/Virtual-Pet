@@ -49,14 +49,13 @@ function increaseSleep (obj){
     document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
 }
 
-function calculateHappiness (){
-    currentPet.happiness = (currentPet.food + currentPet.cleanliness + currentPet.sleep)/3;
+function calculateHappiness (obj){
+    obj.happiness = (obj.food + obj.cleanliness + obj.sleep)/3;
     //console.log(obj.happiness);
     document.querySelector('#happinessDisplay').textContent = "happiness: " + currentPet.happiness;
 }
 
 let currentPet;
-//use a list to implement multiple pets. Use .append with constructor
 
 let bugToSVG = [
             ];
@@ -86,9 +85,9 @@ function startGame(){
 
     document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name; //upon startup, game never used to display first pets name until the user had clicked on one. this line fixes this.
 
+    createNewPet("goub", "shark");
+    
     decreaseStatsInterval();
-
-    createNewPet();
 }
 
 window.addEventListener('load', ()=>{
@@ -129,12 +128,14 @@ function decreaseStatsInterval(){
     }
 
     setTimeout(decreaseStatsInterval, 5000);
+
+    //update all the attribute displays to represent the selected pet
+    UpdateStatDisplays();
 }
 
 function switchCurrentPet(element){
     const selectedId = element.target.id
     
-    //console.log("Clicked on " + selectedId);
     for(const bug in bugToSVG){ //loop through array,
         if (selectedId == bugToSVG[bug][0]){ //until the clicked on SVG id matches one in the array.
             console.log("you just clicked on " + bugToSVG[bug][1].name + "!"); //log the found bug object's name attribute.
@@ -142,16 +143,13 @@ function switchCurrentPet(element){
         }
     }
     //update all the attribute displays to represent the selected pet
-    document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name;
-    document.querySelector('#foodDisplay').textContent = "food: " + currentPet.food;
-    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentPet.cleanliness;
-    document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
+    UpdateStatDisplays();
 }
 
-function createNewPet(){
+function createNewPet(newPetName, newPetType){
     //create svg
     let newCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); //No idea why i need to use the NS variant of createElement, nor why I need to specifiy a namespace. SVGs may just be that way.
-    newCircle.setAttributeNS(null, "id", "bug3"); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
+    newCircle.setAttributeNS(null, "id", "bug"+(bugNumber+1)); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
     newCircle.setAttributeNS(null, "cx", "175");
     newCircle.setAttributeNS(null, "cy", "175");
     newCircle.setAttributeNS(null, "r", "20");
@@ -162,10 +160,19 @@ function createNewPet(){
 
     //create object
     bugToSVG.push([newCircle.id, null]);
-    bugToSVG[bugNumber][1] = new Pet("goub", "shark");
+    bugToSVG[bugNumber][1] = new Pet(newPetName, newPetType);
 
     console.log(bugToSVG);
 
     //attatch event listener
     newCircle.addEventListener('click', (e)=>switchCurrentPet(e));
+}
+
+function UpdateStatDisplays(){
+    //update all the attribute displays to represent the selected pet
+    document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name;
+    document.querySelector('#foodDisplay').textContent = "food: " + currentPet.food;
+    document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentPet.cleanliness;
+    document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
+    document.querySelector('#happinessDisplay').textContent = "happiness: " + currentPet.happiness;
 }
