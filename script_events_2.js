@@ -57,8 +57,8 @@ function calculateHappiness (obj){
 
 let currentPet;
 
-let bugToSVG = [
-            ];
+let bugToSVG = [];
+
 let bugNumber;
 
 function startGame(){
@@ -85,7 +85,7 @@ function startGame(){
 
     document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name; //upon startup, game never used to display first pets name until the user had clicked on one. this line fixes this.
 
-    createNewPet("goub", "shark");
+    //createNewPet("goub", "shark");
     
     decreaseStatsInterval();
 }
@@ -116,6 +116,9 @@ function addListeners(){
 
     const bug2 = document.querySelector('#bug2');
     bug2.addEventListener('click', (e)=>switchCurrentPet(e));
+
+    const newPetButton = document.querySelector('#newPet');
+    newPetButton.addEventListener('click', ()=>createNewPet(prompt("Insert new pet's Name",''), prompt("Insert new pet's Type",'')));
 }
 
 //loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
@@ -133,7 +136,7 @@ function decreaseStatsInterval(){
     UpdateStatDisplays();
 }
 
-function switchCurrentPet(element){
+function switchCurrentPet(element){ //uses the e variable from Event Listeners and an array to change the value of the "currentPet" variable.
     const selectedId = element.target.id
     
     for(const bug in bugToSVG){ //loop through array,
@@ -147,6 +150,7 @@ function switchCurrentPet(element){
 }
 
 function createNewPet(newPetName, newPetType){
+    
     //create svg
     let newCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); //No idea why i need to use the NS variant of createElement, nor why I need to specifiy a namespace. SVGs may just be that way.
     newCircle.setAttributeNS(null, "id", "bug"+(bugNumber+1)); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
@@ -166,6 +170,8 @@ function createNewPet(newPetName, newPetType){
 
     //attatch event listener
     newCircle.addEventListener('click', (e)=>switchCurrentPet(e));
+
+    bugNumber += 1;
 }
 
 function UpdateStatDisplays(){
