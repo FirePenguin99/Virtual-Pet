@@ -49,7 +49,7 @@ function increaseSleep (obj){
     document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
 }
 
-function calculateHappiness (obj){
+function calculateHappiness (){
     currentPet.happiness = (currentPet.food + currentPet.cleanliness + currentPet.sleep)/3;
     //console.log(obj.happiness);
     document.querySelector('#happinessDisplay').textContent = "happiness: " + currentPet.happiness;
@@ -60,6 +60,7 @@ let currentPet;
 
 let bugToSVG = [
             ];
+let bugNumber;
 
 function startGame(){
     
@@ -76,6 +77,8 @@ function startGame(){
     bugToSVG.push(["bug2", pet2]); //equates the tag of the SVG element to the object its connected to. This will be done dynamically later
 
     currentPet = pet2;
+
+    bugNumber = 2;
     console.log(currentPet.name);
 
     console.log(bugToSVG); //eheck in console if array is filled properly
@@ -85,7 +88,7 @@ function startGame(){
 
     decreaseStatsInterval();
 
-    createNewCircle();
+    createNewPet();
 }
 
 window.addEventListener('load', ()=>{
@@ -145,13 +148,24 @@ function switchCurrentPet(element){
     document.querySelector('#sleepDisplay').textContent = "sleep: " + currentPet.sleep;
 }
 
-function createNewCircle(){
+function createNewPet(){
+    //create svg
     let newCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); //No idea why i need to use the NS variant of createElement, nor why I need to specifiy a namespace. SVGs may just be that way.
     newCircle.setAttributeNS(null, "id", "bug3"); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
     newCircle.setAttributeNS(null, "cx", "175");
     newCircle.setAttributeNS(null, "cy", "175");
     newCircle.setAttributeNS(null, "r", "20");
     
+    //insert svg
     const targetDiv = document.querySelector('#canvas'); //find and store where to place the svg in the HTML
     targetDiv.appendChild(newCircle); //append circle into the HTML, as a child of the SVG element.
+
+    //create object
+    bugToSVG.push([newCircle.id, null]);
+    bugToSVG[bugNumber][1] = new Pet("goub", "shark");
+
+    console.log(bugToSVG);
+
+    //attatch event listener
+    newCircle.addEventListener('click', (e)=>switchCurrentPet(e));
 }
