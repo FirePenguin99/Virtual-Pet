@@ -154,9 +154,10 @@ function createNewPet(newPetName, newPetType){
     //create svg
     let newCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); //No idea why i need to use the NS variant of createElement, nor why I need to specifiy a namespace. SVGs may just be that way.
     newCircle.setAttributeNS(null, "id", "bug"+(bugNumber+1)); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
-    newCircle.setAttributeNS(null, "cx", "175");
-    newCircle.setAttributeNS(null, "cy", "175");
+    newCircle.setAttributeNS(null, "cx", "" + (Math.floor(Math.random() * 250))); //randomises spawning position
+    newCircle.setAttributeNS(null, "cy", + (Math.floor(Math.random() * 250)));
     newCircle.setAttributeNS(null, "r", "20");
+    newCircle.style.fill = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255))); //randomises colour just for some temporary visual flair.
     
     //insert svg
     const targetDiv = document.querySelector('#canvas'); //find and store where to place the svg in the HTML
