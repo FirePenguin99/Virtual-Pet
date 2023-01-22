@@ -59,33 +59,18 @@ let currentPet;
 
 let bugToSVG = [];
 
-let bugNumber;
+let bugNumber = 0;
 
 function startGame(){
     
-    console.log("Welcome to your Virtual Pet!")
-    let pet1 = new Pet("goob", "cat");
-    console.log("Say hello to your new " + pet1.type + ": " + pet1.name + "!")
-    bugToSVG.push(["bug1", pet1]); //equates the tag of the SVG element to the object its connected to. This will be done dynamically later
+    console.log("Welcome to your Hive!")
+    createNewPet((prompt("Insert the name of your Queen",'')), "queen"); 
+    console.log(bugToSVG);
     
-    currentPet = pet1;
-    console.log(currentPet.name);
-
-    let pet2 = new Pet("gewb", "dog");
-    console.log("Say hello to your new " + pet2.type + ": " + pet2.name + "!")
-    bugToSVG.push(["bug2", pet2]); //equates the tag of the SVG element to the object its connected to. This will be done dynamically later
-
-    currentPet = pet2;
-
-    bugNumber = 2;
-    console.log(currentPet.name);
-
-    console.log(bugToSVG); //eheck in console if array is filled properly
-
+    console.log(currentPet);
 
     document.querySelector('#nameDisplay').textContent = "name: " + currentPet.name; //upon startup, game never used to display first pets name until the user had clicked on one. this line fixes this.
 
-    //createNewPet("goub", "shark");
     
     decreaseStatsInterval();
 }
@@ -111,11 +96,6 @@ function addListeners(){
     const tireButton = document.querySelector('#subSleep');
     tireButton.addEventListener('click', ()=>reduceSleep(currentPet));
 
-    const bug1 = document.querySelector('#bug1');
-    bug1.addEventListener('click', (e)=>switchCurrentPet(e));
-
-    const bug2 = document.querySelector('#bug2');
-    bug2.addEventListener('click', (e)=>switchCurrentPet(e));
 
     const newPetButton = document.querySelector('#newPet');
     newPetButton.addEventListener('click', ()=>createNewPet(prompt("Insert new pet's Name",''), prompt("Insert new pet's Type",'')));
@@ -172,7 +152,9 @@ function createNewPet(newPetName, newPetType){
     //attatch event listener
     newCircle.addEventListener('click', (e)=>switchCurrentPet(e));
 
-    bugNumber += 1;
+    currentPet = bugToSVG[bugNumber][1];
+
+    bugNumber = bugNumber + 1;
 }
 
 function UpdateStatDisplays(){
