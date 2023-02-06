@@ -1,5 +1,5 @@
 export class Bug {
-    constructor(name, type, colour){
+    constructor(name, type, spawnX, spawnY, colour){
         this.name = name
         this.type = type
         this.food = 100
@@ -7,10 +7,20 @@ export class Bug {
         this.cleanliness = 100
         this.happiness = 50
 
-        this.x = 100;
-        this.y = 100;
+        this.x = spawnX;
+        this.y = spawnY;
+
+        this.width = 20;
+        this.height = 20;
 
         this.colour = colour;
+
+        this.bounds = {
+            left : this.x,
+            right : this.x + this.width,
+            top : this.y,
+            bottom : this. y + this.height
+        }
     }
     reduceFood(){
         this.food -= 2;
@@ -44,6 +54,15 @@ export class Bug {
 
     draw(context){
         context.fillStyle = this.colour;
-        context.fillRect(this.x, this.y, 20, 20);
+        context.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    recalculateBounds(){
+        this.bounds = {
+            left : this.x,
+            right : this.x + this.width,
+            top : this.y,
+            bottom : this. y + this.height
+        }
     }
 }

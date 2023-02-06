@@ -4,32 +4,38 @@ window.addEventListener('load', ()=>{
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
     
-    function animate(){ //function that happens all the time
+    function animateAll(){ //function that happens all the time
         ctx.clearRect(0, 0, 1200, 800);
-        bug1.draw(ctx);
-        bug1.x += 1;
-        requestAnimationFrame(animate);
+        
+        for (let bug in bugsList){ //Loop through array containing all Bugs, and call their draw() method.
+            bugsList[bug].draw(ctx);
+        }
+        
+        //Move bug1
+        // bug1.x += 1;
+        // bug1.recalculateBounds();
+        
+        requestAnimationFrame(animateAll);
     }
 
     let currentBug;
     let bugsList = [];
     let bugNumber = 0;
 
-    let bug1 = new Bug("goob", "queen", 'red'); 
+    const randomColour = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)));
+    let bug1 = new Bug("goob", "queen", 100, 100, randomColour ); 
+    
     console.log(bug1);
-        
     bugsList.push(bug1);
-    console.log(bugsList);
-
     currentBug = bug1;
-    console.log(currentBug);
-
-    document.querySelector('#nameDisplay').textContent = "name: " + currentBug.name; //upon startup, game never used to display first pets name until the user had clicked on one. this line fixes this.
+    
+    document.querySelector('#nameDisplay').textContent = "name: " + currentBug.name; //Upon startup, game never used to display first pets name until the user had clicked on one. This line fixes this.
 
 
     addListeners();
     // startGame();
-    animate();
+    animateAll();
+    decreaseStatsInterval();
 
     function addListeners(){
         const feedButton = document.querySelector('#plusFood');
@@ -45,65 +51,64 @@ window.addEventListener('load', ()=>{
         const tireButton = document.querySelector('#subSleep');
         tireButton.addEventListener('click', ()=>currentBug.reduceSleep());
 
-
         const newPetButton = document.querySelector('#newPet');
-        newPetButton.addEventListener('click', ()=>createNewPet(prompt("Insert new pet's Name",''), prompt("Insert new pet's Type",'')));
+        newPetButton.addEventListener('click', ()=>createNewBug(prompt("Insert new bug's Name",''), prompt("Insert new bug's Type",'')));
+
+        const canvas = document.getElementById("canvas1");
+        canvas.addEventListener('click', (e)=> selectBug(e));
+    
+
     }
 
     //loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
-    // function decreaseStatsInterval(){
-    //     for(const bug in bugToSVG){
-    //         reduceFood(bugToSVG[bug][1]);
-    //         reduceCleanliness(bugToSVG[bug][1]);
-    //         reduceSleep(bugToSVG[bug][1]);
-    //         calculateHappiness(bugToSVG[bug][1]);
-    //     }
-
-    //     setTimeout(decreaseStatsInterval, 5000);
-
-    //     //update all the attribute displays to represent the selected pet
-    //     UpdateStatDisplays();
-    // }
-
-    function switchcurrentBug(element){ //uses the e variable from Event Listeners and an array to change the value of the "currentBug" variable.
-        const selectedId = element.target.id
-        
-        for(const bug in bugToSVG){ //loop through array,
-            if (selectedId == bugToSVG[bug][0]){ //until the clicked on SVG id matches one in the array.
-                console.log("you just clicked on " + bugToSVG[bug][1].name + "!"); //log the found bug object's name attribute.
-                currentBug = bugToSVG[bug][1];
-            }
+    function decreaseStatsInterval(){
+        for(const bug in bugsList){
+            bugsList[bug].reduceFood();
+            bugsList[bug].reduceSleep();
+            bugsList[bug].reduceCleanliness();
         }
+
+        setTimeout(decreaseStatsInterval, 5000);
+
         //update all the attribute displays to represent the selected pet
         UpdateStatDisplays();
     }
 
-    function createNewPet(newBugName, newBugType){
-        // //create svg
-        // let newCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); //No idea why i need to use the NS variant of createElement, nor why I need to specifiy a namespace. SVGs may just be that way.
-        // newCircle.setAttributeNS(null, "id", "bug"+(bugNumber+1)); //null is the namespace of the attribute, in which SVGs seem to not have in this instance, therefore null.
-        // newCircle.setAttributeNS(null, "cx", "" + (Math.floor(Math.random() * 250))); //randomises spawning position
-        // newCircle.setAttributeNS(null, "cy", + (Math.floor(Math.random() * 250)));
-        // newCircle.setAttributeNS(null, "r", "20");
-        // newCircle.style.fill = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255))); //randomises colour just for some temporary visual flair.
+    function getMousePosition(canvas, event){ //Taken off the web, don't fully understand what getBoundingClientRect does.
+        const bounds = canvas.getBoundingClientRect();
+        const mousePos = {
+            x: event.clientX - bounds.left,
+            y: event.clientY - bounds.top
+        }
+        return mousePos;
+    }
+
+    function selectBug(event){ //It compares the returned value of getMousePosition and compares it to the corner co-ordinates of all bugs in the game (probably slow).
+        const mousePos = getMousePosition(canvas, event); //Takes the event parameter for use in getMousePosition
+        for (let bug in bugsList){
+            if (mousePos.x >= bugsList[bug].bounds.left &&
+                mousePos.x <= bugsList[bug].bounds.right &&
+                mousePos.y >= bugsList[bug].bounds.top && 
+                mousePos.y <= bugsList[bug].bounds.bottom){ //If mousePos is within the bounds of a Bug, set currentBug as the currently iterated bug, and log it's name.
+                    currentBug = bugsList[bug];      
+                    console.log(currentBug.name);   //Log Bug data
+            }else{
+                console.log("No bug 'ere");
+            }
+        }
         
-        // //insert svg
-        // const targetDiv = document.querySelector('#canvas'); //find and store where to place the svg in the HTML
-        // targetDiv.appendChild(newCircle); //append circle into the HTML, as a child of the SVG element.
+        //update all the attribute displays to represent the selected pet
+        UpdateStatDisplays();
+    }
 
+    function createNewBug(newBugName, newBugType){
         //create object
-        bugToSVG.push([newCircle.id, null]);
-        bugToSVG[bugNumber][1] = new Pet(newPetName, newPetType);
-
-        bugsList.push(new Bug(newBugName, newBugType, "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)))))
+        const randomColour = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)));
+        bugsList.push(new Bug(newBugName, newBugType, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800)), randomColour ));
 
         console.log(bugsList);
 
-        //attach event listener
-        newCircle.addEventListener('click', (e)=>switchcurrentBug(e));
-
-        currentBug = bugToSVG[bugNumber][1];
-
+        currentBug = bugsList[bugNumber];
         bugNumber = bugNumber + 1;
     }
 
