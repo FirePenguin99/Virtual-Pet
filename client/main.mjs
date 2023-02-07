@@ -3,17 +3,38 @@ import { Bug } from './bugs.mjs';
 window.addEventListener('load', ()=>{
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
-    
-    function updateFrame(){ //function that happens every frame
-        ctx.clearRect(0, 0, 1200, 800); //clears the entire canvas element
+
+    let previousTimeStamp = 0 //initialising previousTimeStamp for use in updateFrame()
+    function updateFrame(timeStamp){ //function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
+        if (timeStamp == null){timeStamp = 16.6666}
+        const deltaTime = timeStamp - previousTimeStamp;
+        previousTimeStamp = timeStamp; 
         
+        
+        
+        ctx.clearRect(0, 0, 1200, 800); //clears the entire canvas element
         for (let bug in bugsList){ //Loop through array containing all Bugs, and call their draw() method.
             bugsList[bug].draw(ctx);
         }
         
-        // Move bug1
-        //bug1.x += 1;
-        //bug1.recalculateBounds();
+        if (bug1.wanderTimer > bug1.wanderInterval && bug1.behaviour == "wants_to_wander"){ //If the wander timer is up, and the bug is ready to begin wandering:
+            bug1.wanderTimer = 0;
+
+            bug1.moveDestination = {x: ((Math.random()*500 - 250 + bug1.x)), y: ((Math.random()*500 - 250 + bug1.y))};
+            console.log(bug1.moveDestination);
+            bug1.behaviour = "moving"; //We get him moving
+
+            bug1.wanderInterval = (Math.random() * 10000);
+        }
+
+        if (bug1.behaviour == "moving"){
+            bug1.moveLerp(2);
+            // console.log(bug1.x + ", " + bug1.y);
+        }
+        bug1.wanderTimer += deltaTime;
+        // console.log(bug1.wanderTimer);
+        // console.log(bug1.wanderInterval);
+
         
         requestAnimationFrame(updateFrame);
     }
@@ -23,7 +44,7 @@ window.addEventListener('load', ()=>{
     let bugNumber = 0;
 
     const randomColour = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)));
-    let bug1 = new Bug("goob", "queen", 100, 100, randomColour ); 
+    let bug1 = new Bug("goob", "queen", 600, 400, randomColour ); 
     
     console.log(bug1);
     bugsList.push(bug1);
@@ -31,10 +52,13 @@ window.addEventListener('load', ()=>{
     
     document.querySelector('#nameDisplay').textContent = "name: " + currentBug.name; //Upon startup, game never used to display first pets name until the user had clicked on one. This line fixes this.
 
-
     addListeners();
     updateFrame();
     decreaseStatsInterval();
+
+    // console.log(bug1.x + ", " + bug1.y);
+    // bug1.moveLerp({x:200, y:200}, 5);
+
 
 
     function decreaseStatsInterval(){ //loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
