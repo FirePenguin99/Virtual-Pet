@@ -2,7 +2,7 @@ export class Bug {
     constructor(name, type, spawnX, spawnY, colour){
         this.name = name
         this.type = type
-        this.food = 100
+        this.food = 10
         this.sleep = 100
         this.cleanliness = 100
         this.happiness = 50
@@ -37,21 +37,31 @@ export class Bug {
 
     increaseFood (){
         this.food += 2;
+        if (this.food > 100){ //Sets max number to 100
+            this.food = 100;
+        }
         document.querySelector('#foodDisplay').textContent = "food: " + this.food;
     }
     increaseCleanliness (){
         this.cleanliness += 2;
+        if (this.cleanliness > 100){ //Sets max number to 100
+            this.cleanliness = 100;
+        }
         document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + this.cleanliness;
     }
     increaseSleep (){
         this.sleep += 2;
+        if (this.sleep > 100){ //Sets max number to 100
+            this.sleep = 100;
+        }
         document.querySelector('#sleepDisplay').textContent = "sleep: " + this.sleep;
     }
     calculateHappiness (){
         this.happiness = (this.food + this.cleanliness + this.sleep)/3;
         document.querySelector('#happinessDisplay').textContent = "happiness: " + this.happiness;
     }
-
+    
+    
     draw(context){
         context.fillStyle = this.colour;
         context.fillRect(this.x, this.y, this.width, this.height);

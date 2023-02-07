@@ -4,18 +4,18 @@ window.addEventListener('load', ()=>{
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
     
-    function animateAll(){ //function that happens all the time
-        ctx.clearRect(0, 0, 1200, 800);
+    function updateFrame(){ //function that happens every frame
+        ctx.clearRect(0, 0, 1200, 800); //clears the entire canvas element
         
         for (let bug in bugsList){ //Loop through array containing all Bugs, and call their draw() method.
             bugsList[bug].draw(ctx);
         }
         
-        //Move bug1
-        // bug1.x += 1;
-        // bug1.recalculateBounds();
+        // Move bug1
+        //bug1.x += 1;
+        //bug1.recalculateBounds();
         
-        requestAnimationFrame(animateAll);
+        requestAnimationFrame(updateFrame);
     }
 
     let currentBug;
@@ -33,41 +33,19 @@ window.addEventListener('load', ()=>{
 
 
     addListeners();
-    // startGame();
-    animateAll();
+    updateFrame();
     decreaseStatsInterval();
 
-    function addListeners(){
-        const feedButton = document.querySelector('#plusFood');
-        feedButton.addEventListener('click', ()=>currentBug.increaseFood());
-        const cleanButton = document.querySelector('#plusClean');
-        cleanButton.addEventListener('click', ()=>currentBug.increaseCleanliness());
-        const sleepButton = document.querySelector('#plusSleep');
-        sleepButton.addEventListener('click', ()=>currentBug.increaseSleep());
-        const starveButton = document.querySelector('#subFood');
-        starveButton.addEventListener('click', ()=>currentBug.reduceFood());
-        const dirtyButton = document.querySelector('#subClean');
-        dirtyButton.addEventListener('click', ()=>currentBug.reduceCleanliness());
-        const tireButton = document.querySelector('#subSleep');
-        tireButton.addEventListener('click', ()=>currentBug.reduceSleep());
 
-        const newPetButton = document.querySelector('#newPet');
-        newPetButton.addEventListener('click', ()=>createNewBug(prompt("Insert new bug's Name",''), prompt("Insert new bug's Type",'')));
-
-        const canvas = document.getElementById("canvas1");
-        canvas.addEventListener('click', (e)=> selectBug(e));
-    
-
-    }
-
-    //loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
-    function decreaseStatsInterval(){
+    function decreaseStatsInterval(){ //loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
         for(const bug in bugsList){
             bugsList[bug].reduceFood();
             bugsList[bug].reduceSleep();
             bugsList[bug].reduceCleanliness();
-        }
+            bugsList[bug].calculateHappiness();
 
+            checkBugDeath(bugsList[bug])
+        }
         setTimeout(decreaseStatsInterval, 5000);
 
         //update all the attribute displays to represent the selected pet
@@ -101,7 +79,7 @@ window.addEventListener('load', ()=>{
         UpdateStatDisplays();
     }
 
-    function createNewBug(newBugName, newBugType){
+    function createNewBug(newBugName, newBugType){ 
         //create object
         const randomColour = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)));
         bugsList.push(new Bug(newBugName, newBugType, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800)), randomColour ));
@@ -112,6 +90,23 @@ window.addEventListener('load', ()=>{
         bugNumber = bugNumber + 1;
     }
 
+    function checkBugDeath(bugObj){
+        if (bugObj.food < 0){
+            bugDeath(bugObj, "food");
+        }else if (bugObj.sleep < 0){
+            bugDeath(bugObj, "sleep");
+        }else if (bugObj.cleanliness < 0){
+            bugDeath(bugObj, "cleanliness");
+        }else{
+            return;
+        }
+    }
+    function bugDeath(bugObj, cause){
+        const bugIndex = bugsList.indexOf(bugObj);
+        console.log("Your bug: " + bugObj.name + " has died due to a lack of " + cause);
+        bugsList.splice(bugIndex, 1);
+    }
+
     function UpdateStatDisplays(){
         //update all the attribute displays to represent the selected pet
         document.querySelector('#nameDisplay').textContent = "name: " + currentBug.name;
@@ -119,5 +114,26 @@ window.addEventListener('load', ()=>{
         document.querySelector('#cleanlinessDisplay').textContent = "cleanliness: " + currentBug.cleanliness;
         document.querySelector('#sleepDisplay').textContent = "sleep: " + currentBug.sleep;
         document.querySelector('#happinessDisplay').textContent = "happiness: " + currentBug.happiness;
+    }
+
+    function addListeners(){
+        const feedButton = document.querySelector('#plusFood');
+        feedButton.addEventListener('click', ()=>currentBug.increaseFood());
+        const cleanButton = document.querySelector('#plusClean');
+        cleanButton.addEventListener('click', ()=>currentBug.increaseCleanliness());
+        const sleepButton = document.querySelector('#plusSleep');
+        sleepButton.addEventListener('click', ()=>currentBug.increaseSleep());
+        const starveButton = document.querySelector('#subFood');
+        starveButton.addEventListener('click', ()=>currentBug.reduceFood());
+        const dirtyButton = document.querySelector('#subClean');
+        dirtyButton.addEventListener('click', ()=>currentBug.reduceCleanliness());
+        const tireButton = document.querySelector('#subSleep');
+        tireButton.addEventListener('click', ()=>currentBug.reduceSleep());
+
+        const newPetButton = document.querySelector('#newPet');
+        newPetButton.addEventListener('click', ()=>createNewBug(prompt("Insert new bug's Name",''), prompt("Insert new bug's Type",'')));
+
+        const canvas = document.getElementById("canvas1");
+        canvas.addEventListener('click', (e)=> selectBug(e));
     }
 });
