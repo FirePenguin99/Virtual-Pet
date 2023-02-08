@@ -86,6 +86,15 @@ window.addEventListener('load', ()=>{
         //update all the attribute displays to represent the selected pet
         UpdateStatDisplays();
     }
+    function moveMap(event, oldPos){
+        if (oldPos == null){
+
+        }
+        const currentPos = getMousePosition(canvas, event); //current mouse position on this frame
+        const mouseDiff = currentPos - oldPos; //calculates movement of the mouse between frames
+
+        //then add all the positions of each bug in the scene by mouseDiff
+    }
 
     function createNewBug(newBugName, newBugType){ 
         //create object
@@ -142,6 +151,7 @@ window.addEventListener('load', ()=>{
         newPetButton.addEventListener('click', ()=>createNewBug(prompt("Insert new bug's Name",''), prompt("Insert new bug's Type",'')));
 
         const canvas = document.getElementById("canvas1");
-        canvas.addEventListener('click', (e)=> selectBug(e));
+        canvas.addEventListener('click', (e)=> selectBug(e, null));
+        canvas.addEventListener('mousedown mouseup', (e)=> moveMap(e)); //Doubt this'll work as intended. Will need somekind of setTimeout or running in the updateAll function. If so, then may not be possible to use event listeners.
     }
 });
