@@ -93,24 +93,37 @@ export class Bug {
 
         const xSpeed = (this.moveDestination.x - this.x)/timeNeeded;
         const ySpeed = (this.moveDestination.y - this.y)/timeNeeded;
-        // console.log("xSpeed: " + Math.abs(xSpeed) + " > than difference: " + Math.abs(this.moveDestination.x - this.x));
-        // console.log("ySpeed: " + Math.abs(ySpeed) + " > than difference: " + Math.abs(this.moveDestination.y - this.y));
 
 
         if (Math.abs(this.moveDestination.x - this.x) <= Math.abs(xSpeed) && Math.abs(this.moveDestination.y - this.y) <= Math.abs(ySpeed)){//If the bug is too close to the destination and the xSpeed and ySpeed will overshoot, teleport to final destination
             this.x = this.moveDestination.x;
             this.y = this.moveDestination.y;
-            //console.log("TELEPORT TIME!");
             
             this.behaviour = "wants_to_wander";
             return;
-        }else{
-            //console.log("BLARG!")
         }
 
         this.x += xSpeed;
         this.y += ySpeed;
 
         this.recalculateBounds();  //bug has moved, and therefore must recalculate its bounds so it can be clicked on correctly
+    }
+
+    wanderMovement(deltaTime){
+        if (this.wanderTimer > this.wanderInterval){ //If the wander timer is up, and the bug is ready to begin wandering:
+            this.wanderTimer = 0;
+
+            this.moveDestination = {x: ((Math.random()*500 - 250 + this.x)), y: ((Math.random()*500 - 250 + this.y))};
+            console.log(this.moveDestination);
+            this.behaviour = "moving"; //We get him moving
+
+            this.wanderInterval = (Math.random() * 10000);
+        }
+
+        if (this.behaviour == "moving"){
+            this.moveLerp(2);
+            // console.log(this.x + ", " + this.y);
+        }
+        this.wanderTimer += deltaTime;
     }
 }

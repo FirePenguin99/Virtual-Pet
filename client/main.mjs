@@ -15,27 +15,11 @@ window.addEventListener('load', ()=>{
         ctx.clearRect(0, 0, 1200, 800); //clears the entire canvas element
         for (let bug in bugsList){ //Loop through array containing all Bugs, and call their draw() method.
             bugsList[bug].draw(ctx);
+            
+            bugsList[bug].wanderMovement(deltaTime);
         }
-        
-        if (bug1.wanderTimer > bug1.wanderInterval && bug1.behaviour == "wants_to_wander"){ //If the wander timer is up, and the bug is ready to begin wandering:
-            bug1.wanderTimer = 0;
-
-            bug1.moveDestination = {x: ((Math.random()*500 - 250 + bug1.x)), y: ((Math.random()*500 - 250 + bug1.y))};
-            console.log(bug1.moveDestination);
-            bug1.behaviour = "moving"; //We get him moving
-
-            bug1.wanderInterval = (Math.random() * 10000);
-        }
-
-        if (bug1.behaviour == "moving"){
-            bug1.moveLerp(2);
-            // console.log(bug1.x + ", " + bug1.y);
-        }
-        bug1.wanderTimer += deltaTime;
         // console.log(bug1.wanderTimer);
         // console.log(bug1.wanderInterval);
-
-        
         requestAnimationFrame(updateFrame);
     }
 
