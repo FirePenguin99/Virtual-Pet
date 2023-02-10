@@ -1,10 +1,14 @@
 import { Bug } from './bugs.mjs';
+import { Entity } from './entity.mjs';
 
 window.addEventListener('load', ()=>{
     //Variables for initialising canvas in js
-    const canvas = document.getElementById("canvas1");
+    const canvas = document.querySelector("#canvas1");
     const ctx = canvas.getContext('2d');
-
+    
+    const mapImage = document.querySelector("#map");
+    
+    
     //Variables for mouse movement and map movement
     let mouseHold = false;
     let canvasMousePos = {x: null, y: null};
@@ -28,8 +32,10 @@ window.addEventListener('load', ()=>{
         
         //For clearing and redrawing the objects in the scene, as well as bug behaviour
         ctx.clearRect(0, 0, 1200, 800); //clears the entire canvas element
+        
+        mapObject.draw(ctx, visualOffset);
+        
         for (let bug in bugsList){ //Loop through array containing all Bugs, and call their draw() method.
-            
             bugsList[bug].draw(ctx, visualOffset);
             
             bugsList[bug].wanderMovement(deltaTime); //logic for each bug's behaviour
@@ -41,21 +47,16 @@ window.addEventListener('load', ()=>{
 
     
     
-    
+    const mapObject = new Entity("map", -1000, -1000, mapImage);
     
     
     let currentBug;
     let bugsList = [];
     let bugNumber = 0;
 
-    const randomColour = "rgb("+((Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)) + ", " + (Math.floor(Math.random() * 255)));
-    let bug1 = new Bug("goob", "queen", 600, 400, randomColour ); 
+    createNewBug("goob", "queen");
     
-    console.log(bug1);
-    bugsList.push(bug1);
-    currentBug = bug1;
     
-    document.querySelector('#nameDisplay').textContent = "name: " + currentBug.name; //Upon startup, game never used to display first pets name until the user had clicked on one. This line fixes this.
 
     addListeners();
     updateFrame();
@@ -93,10 +94,6 @@ window.addEventListener('load', ()=>{
         if (oldPos == null){
             oldPos = canvasMousePos
         }else{
-            // console.log(canvasMousePos);
-            // console.log(oldPos);
-            console.log(canvasMousePos.x - oldPos.x)
-            
             visualOffset.x += (canvasMousePos.x - oldPos.x); //calculates movement of the mouse between frames and adds them to a total offset
             visualOffset.y += (canvasMousePos.y - oldPos.y);
             oldPos = canvasMousePos;
@@ -112,6 +109,7 @@ window.addEventListener('load', ()=>{
 
         currentBug = bugsList[bugNumber];
         bugNumber = bugNumber + 1;
+        UpdateStatDisplays();
     }
 
     function checkBugDeath(bugObj){
@@ -129,6 +127,8 @@ window.addEventListener('load', ()=>{
         const bugIndex = bugsList.indexOf(bugObj);
         console.log("Your bug: " + bugObj.name + " has died due to a lack of " + cause);
         bugsList.splice(bugIndex, 1);
+        bugNumber += -1;
+
     }
 
     
