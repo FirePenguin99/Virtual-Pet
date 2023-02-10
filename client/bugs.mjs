@@ -67,9 +67,9 @@ export class Bug {
     }
     
     
-    draw(context){
+    draw(context, offset){
         context.fillStyle = this.colour;
-        context.fillRect(this.x, this.y, this.width, this.height);
+        context.fillRect(this.x + offset.x, this.y + offset.y, this.width, this.height); //Adds actual position with visual offset from moving the camera/map.
     }
 
     recalculateBounds(){
