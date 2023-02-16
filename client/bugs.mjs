@@ -1,5 +1,5 @@
 export class Bug {
-  constructor(name, type, spawnX, spawnY, colour) {
+  constructor(name, type, spawnX, spawnY, image) {
     this.name = name;
     this.type = type;
     this.food = 50;
@@ -12,8 +12,7 @@ export class Bug {
 
     this.width = 20;
     this.height = 20;
-
-    this.colour = colour;
+    this.image = image;
 
     this.bounds = {
       left: this.x,
@@ -74,8 +73,7 @@ export class Bug {
 
 
   draw(context, offset) {
-    context.fillStyle = this.colour;
-    context.fillRect(this.x + offset.x, this.y + offset.y, this.width, this.height); // Adds actual position with visual offset from moving the camera/map.
+    context.drawImage(this.image, this.x + offset.x, this.y + offset.y, this.width, this.height); // Adds actual position with visual offset from moving the camera/map.
   }
 
   recalculateBounds() {
@@ -130,5 +128,37 @@ export class Bug {
       // console.log(this.x + ", " + this.y);
     }
     this.wanderTimer += deltaTime;
+  }
+}
+
+export class Queen extends Bug {
+  constructor(name, spawnX, spawnY) {
+    super(spawnX, spawnY);
+    this.x = spawnX;
+    this.y = spawnY;
+
+    this.width = 50;
+    this.height = 50;
+
+    this.name = name;
+    this.type = 'queen';
+
+    this.image = document.querySelector('#queen_sprite');
+  }
+}
+
+export class Worker extends Bug {
+  constructor(name, spawnX, spawnY) {
+    super(spawnX, spawnY);
+    this.x = spawnX;
+    this.y = spawnY;
+
+    this.width = 20;
+    this.height = 20;
+
+    this.name = name;
+    this.type = 'worker';
+
+    this.image = document.querySelector('#worker_sprite');
   }
 }

@@ -38,6 +38,9 @@ export class FoodEntity extends Entity {
     super(spawnX, spawnY, type);
     this.x = spawnX;
     this.y = spawnY;
+    this.type = type;
+
+    this.foodInventory = 100;
 
     this.name = 'food_resource';
   }

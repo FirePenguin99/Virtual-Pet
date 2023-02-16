@@ -1,4 +1,4 @@
-import { Bug } from './bugs.mjs';
+import { Worker, Queen } from './bugs.mjs';
 import { Entity } from './entity.mjs';
 
 window.addEventListener('load', () => {
@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
   const ctx = canvas.getContext('2d');
 
   const mapImage = document.querySelector('#map');
+  // const queenSprite = document.querySelector('#queen_sprite');
 
 
   // Variables for mouse movement and map movement
@@ -24,7 +25,6 @@ window.addEventListener('load', () => {
     const deltaTime = timeStamp - previousTimeStamp;
     previousTimeStamp = timeStamp;
 
-
     if (mouseHold) {
       moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
     }
@@ -32,12 +32,15 @@ window.addEventListener('load', () => {
     // For clearing and redrawing the objects in the scene, as well as bug behaviour
     ctx.clearRect(0, 0, 1200, 800); // clears the entire canvas element
 
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, 1200, 800);
+
     mapObject.draw(ctx, visualOffset);
 
-    for (const bug in bugsList) { // Loop through array containing all Bugs, and call their draw() method.
-      bugsList[bug].draw(ctx, visualOffset);
+    for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
+      bug.draw(ctx, visualOffset);
 
-      bugsList[bug].wanderMovement(deltaTime); // logic for each bug's behaviour
+      bug.wanderMovement(deltaTime); // logic for each bug's behaviour
     }
 
     // call the function again
@@ -61,12 +64,12 @@ window.addEventListener('load', () => {
 
 
   function selectBug() { // It compares the returned value of getMousePosition and compares it to the corner co-ordinates of all bugs in the game (probably slow).
-    for (const bug in bugsList) {
-      if (canvasMousePos.x >= bugsList[bug].bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
-                canvasMousePos.x <= bugsList[bug].bounds.right + visualOffset.x && // This prevents the bug's bounds not being able to be used in collision detection later on,
-                canvasMousePos.y >= bugsList[bug].bounds.top + visualOffset.y && // And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and vusyal feature) only makes sense.
-                canvasMousePos.y <= bugsList[bug].bounds.bottom + visualOffset.y) { // If canvasMousePos is within the bounds of a Bug, set currentBug as the currently iterated bug, and log it's name.
-        currentBug = bugsList[bug];
+    for (const bug of bugsList) {
+      if (canvasMousePos.x >= bug.bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
+                canvasMousePos.x <= bug.bounds.right + visualOffset.x && // This prevents the bug's bounds not being able to be used in collision detection later on,
+                canvasMousePos.y >= bug.bounds.top + visualOffset.y && // And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and vusyal feature) only makes sense.
+                canvasMousePos.y <= bug.bounds.bottom + visualOffset.y) { // If canvasMousePos is within the bounds of a Bug, set currentBug as the currently iterated bug, and log it's name.
+        currentBug = bug;
         console.log(currentBug.name); // Log Bug data
       } else {
         console.log("No bug 'ere");
@@ -99,8 +102,11 @@ window.addEventListener('load', () => {
 
   function createNewBug(newBugName, newBugType) {
     // create object
-    const randomColour = 'rgb(' + ((Math.floor(Math.random() * 255)) + ', ' + (Math.floor(Math.random() * 255)) + ', ' + (Math.floor(Math.random() * 255)));
-    bugsList.push(new Bug(newBugName, newBugType, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800)), randomColour));
+    if (newBugType === 'queen') {
+      bugsList.push(new Queen(newBugName, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800))));
+    } else if (newBugType === 'worker') {
+      bugsList.push(new Worker(newBugName, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800))));
+    }
 
     console.log(bugsList);
 
@@ -135,13 +141,13 @@ window.addEventListener('load', () => {
     document.querySelector('#happinessDisplay').textContent = 'happiness: ' + currentBug.happiness;
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
-    for (const bug in bugsList) {
-      bugsList[bug].reduceFood();
-      bugsList[bug].reduceSleep();
-      bugsList[bug].reduceCleanliness();
-      bugsList[bug].calculateHappiness();
+    for (const bug of bugsList) {
+      bug.reduceFood();
+      bug.reduceSleep();
+      bug.reduceCleanliness();
+      bug.calculateHappiness();
 
-      checkBugDeath(bugsList[bug]);
+      checkBugDeath(bug);
     }
     setTimeout(decreaseStatsInterval, 5000);
 

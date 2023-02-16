@@ -3,11 +3,15 @@
 <title>Virtual Pet</title>
 
 <style> 
-    canvas{
-        border: 0.1em;
-        border-style: dashed;
-        margin: 0.1em;
-        border-color: crimson;
+    *{
+        box-sizing: border-box;
+        border: 0;
+        margin: 0;
+        padding: 0;
+    }
+    
+    p{
+        margin: 0.5em;
     }
 
     img{
@@ -17,6 +21,8 @@
     button{
         display: block;
         margin: 1em;
+        border: 1px solid black;
+        padding: 0.5em;
     }
 </style>
 
@@ -26,7 +32,9 @@
 <div id="pet">
     <canvas id="canvas1" width="1200" height = "800"  style="float:left"></canvas>
     
-    <img id="map" src = "mapImage.jpg">
+    <img id="map" src = "sprites/mapImage.jpg">
+    <img id="queen_sprite" src = "sprites/queen_sprite.png">
+    <img id="worker_sprite" src = "sprites/worker_sprite.png">
     
     <div>
         <p id="nameDisplay"> name: </p>
