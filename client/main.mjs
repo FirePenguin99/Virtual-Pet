@@ -25,15 +25,18 @@ window.addEventListener('load', () => {
     const deltaTime = timeStamp - previousTimeStamp;
     previousTimeStamp = timeStamp;
 
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
     if (mouseHold) {
       moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
     }
 
     // For clearing and redrawing the objects in the scene, as well as bug behaviour
-    ctx.clearRect(0, 0, 1200, 800); // clears the entire canvas element
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
 
     ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, 1200, 800);
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     mapObject.draw(ctx, visualOffset);
 
