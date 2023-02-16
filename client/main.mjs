@@ -1,5 +1,5 @@
 import { Worker, Queen } from './bugs.mjs';
-import { Entity } from './entity.mjs';
+import { Entity, FoodEntity } from './entity.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -35,15 +35,18 @@ window.addEventListener('load', () => {
     // For clearing and redrawing the objects in the scene, as well as bug behaviour
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
 
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = '#000000'; // black void behind the map image
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    mapObject.draw(ctx, visualOffset);
+    mapObject.draw(ctx, visualOffset); // draw map image
 
     for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
       bug.draw(ctx, visualOffset);
 
       bug.wanderMovement(deltaTime); // logic for each bug's behaviour
+    }
+    for (const entity of entityList) { // Loop through array containing all Bugs, and call their draw() method.
+      entity.draw(ctx, visualOffset);
     }
 
     // call the function again
@@ -56,10 +59,12 @@ window.addEventListener('load', () => {
 
   let currentBug;
   const bugsList = [];
+  const entityList = [];
   let bugNumber = 0;
 
   createNewBug('goob', 'queen');
 
+  createNewEntity('food');
 
   addListeners();
   updateFrame();
@@ -74,6 +79,11 @@ window.addEventListener('load', () => {
                 canvasMousePos.y <= bug.bounds.bottom + visualOffset.y) { // If canvasMousePos is within the bounds of a Bug, set currentBug as the currently iterated bug, and log it's name.
         currentBug = bug;
         console.log(currentBug.name); // Log Bug data
+
+        // const divUI = document.querySelector('#UI');
+
+
+        return;
       } else {
         console.log("No bug 'ere");
       }
@@ -117,7 +127,6 @@ window.addEventListener('load', () => {
     bugNumber = bugNumber + 1;
     UpdateStatDisplays();
   }
-
   function checkBugDeath(bugObj) {
     if (bugObj.food < 0) {
       bugDeath(bugObj, 'food');
@@ -132,6 +141,12 @@ window.addEventListener('load', () => {
     console.log('Your bug: ' + bugObj.name + ' has died due to a lack of ' + cause);
     bugsList.splice(bugIndex, 1);
     bugNumber += -1;
+  }
+
+  function createNewEntity(newEntityType) {
+    if (newEntityType === 'food') {
+      entityList.push(new FoodEntity(1000, 1000));
+    }
   }
 
 

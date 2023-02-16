@@ -34,14 +34,18 @@ export class Entity {
 
 
 export class FoodEntity extends Entity {
-  constructor(spawnX, spawnY, type) {
-    super(spawnX, spawnY, type);
+  constructor(spawnX, spawnY) {
+    super(spawnX, spawnY);
     this.x = spawnX;
     this.y = spawnY;
-    this.type = type;
+    this.type = 1;
+
+    this.width = 150;
+    this.height = 65;
 
     this.foodInventory = 100;
 
     this.name = 'food_resource';
+    this.image = document.querySelector('#food_resource_1');
   }
 }
