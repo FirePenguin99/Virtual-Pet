@@ -31,3 +31,14 @@ export class Entity {
     };
   }
 }
+
+
+export class FoodEntity extends Entity {
+  constructor(spawnX, spawnY, type) {
+    super(spawnX, spawnY, type);
+    this.x = spawnX;
+    this.y = spawnY;
+
+    this.name = 'food_resource';
+  }
+}

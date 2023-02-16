@@ -163,8 +163,8 @@ window.addEventListener('load', () => {
     const tireButton = document.querySelector('#subSleep');
     tireButton.addEventListener('click', () => currentBug.reduceSleep());
 
-    const newPetButton = document.querySelector('#newPet');
-    newPetButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), prompt("Insert new bug's Type", '')));
+    const newBugButton = document.querySelector('#newBug');
+    newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
 
     const canvas = document.getElementById('canvas1');
     canvas.addEventListener('click', selectBug);
