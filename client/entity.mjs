@@ -43,9 +43,16 @@ export class FoodEntity extends Entity {
     this.width = 150;
     this.height = 65;
 
+    this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
+      left: this.x,
+      right: this.x + this.width,
+      top: this.y,
+      bottom: this.y + this.height,
+    };
+
     this.foodInventory = 100;
 
-    this.name = 'food_resource';
+    this.name = 'large leaf';
     this.image = document.querySelector('#food_resource_1');
   }
 }

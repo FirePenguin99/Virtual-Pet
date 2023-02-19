@@ -1,4 +1,4 @@
-import { Worker, Queen } from './bugs.mjs';
+import { Worker, Queen, Bug } from './bugs.mjs';
 import { Entity, FoodEntity } from './entity.mjs';
 
 window.addEventListener('load', () => {
@@ -7,8 +7,6 @@ window.addEventListener('load', () => {
   const ctx = canvas.getContext('2d');
 
   const mapImage = document.querySelector('#map');
-  // const queenSprite = document.querySelector('#queen_sprite');
-
 
   // Variables for mouse movement and map movement
   let mouseHold = false;
@@ -54,10 +52,10 @@ window.addEventListener('load', () => {
   }
 
 
-  const mapObject = new Entity('map', -1000, -1000, mapImage);
+  const mapObject = new Entity('map', -550, -400, mapImage);
 
 
-  let currentBug;
+  let currentObj;
   const bugsList = [];
   const entityList = [];
   let bugNumber = 0;
@@ -71,26 +69,19 @@ window.addEventListener('load', () => {
   decreaseStatsInterval();
 
 
-  function selectBug() { // It compares the returned value of getMousePosition and compares it to the corner co-ordinates of all bugs in the game (probably slow).
-    for (const bug of bugsList) {
-      if (canvasMousePos.x >= bug.bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
-                canvasMousePos.x <= bug.bounds.right + visualOffset.x && // This prevents the bug's bounds not being able to be used in collision detection later on,
-                canvasMousePos.y >= bug.bounds.top + visualOffset.y && // And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and vusyal feature) only makes sense.
-                canvasMousePos.y <= bug.bounds.bottom + visualOffset.y) { // If canvasMousePos is within the bounds of a Bug, set currentBug as the currently iterated bug, and log it's name.
-        currentBug = bug;
-        console.log(currentBug.name); // Log Bug data
-
-        // const divUI = document.querySelector('#UI');
-
-
+  function selectObject() { // It compares the returned value of getMousePosition and compares it to the corner co-ordinates of all bugs in the game (probably slow).
+    const bugsAndEntity = bugsList.concat(entityList); // combine bugs and entity arrays
+    for (const obj of bugsAndEntity) {
+      if (canvasMousePos.x >= obj.bounds.left + visualOffset.x && canvasMousePos.x <= obj.bounds.right + visualOffset.x && canvasMousePos.y >= obj.bounds.top + visualOffset.y && canvasMousePos.y <= obj.bounds.bottom + visualOffset.y) {
+      // Adds visualOffset to the bound calculates, rather than the bounds itself. This prevents the bug's bounds not being able to be used in collision detection later on, And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and vusyal feature) only makes sense. If canvasMousePos is within the bounds of a Bug, set currentObj as the currently iterated bug, and log it's name.
+        console.log(obj.name);
+        currentObj = obj;
+        UpdateStatDisplays();
         return;
       } else {
         console.log("No bug 'ere");
       }
     }
-
-    // update all the attribute displays to represent the selected pet
-    UpdateStatDisplays();
   }
   function toggleHold() { // Called by event listeners on mouse down and mouse up. Toggles a bool variable which represents the mouse's state
     mouseHold = !mouseHold;
@@ -123,7 +114,7 @@ window.addEventListener('load', () => {
 
     console.log(bugsList);
 
-    currentBug = bugsList[bugNumber];
+    currentObj = bugsList[bugNumber];
     bugNumber = bugNumber + 1;
     UpdateStatDisplays();
   }
@@ -152,11 +143,40 @@ window.addEventListener('load', () => {
 
   function UpdateStatDisplays() {
     // update all the attribute displays to represent the selected pet
-    document.querySelector('#nameDisplay').textContent = 'name: ' + currentBug.name;
-    document.querySelector('#foodDisplay').textContent = 'food: ' + currentBug.food;
-    document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentBug.cleanliness;
-    document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentBug.sleep;
-    document.querySelector('#happinessDisplay').textContent = 'happiness: ' + currentBug.happiness;
+    const childOfDiv = document.querySelector('#UI').children; // Hide all child elements of the UI div
+    for (let index = 0; index < childOfDiv.length; index++) {
+      childOfDiv[index].style.display = 'none';
+    }
+
+    document.querySelector('#nameDisplay').style.display = 'block';
+    document.querySelector('#nameDisplay').textContent = 'name: ' + currentObj.name;
+
+    if (currentObj instanceof Bug) { // Show and update only the relevent child elements
+      document.querySelector('#plusFood').style.display = 'block';
+      document.querySelector('#plusClean').style.display = 'block';
+      document.querySelector('#plusSleep').style.display = 'block';
+
+      document.querySelector('#subFood').style.display = 'block';
+      document.querySelector('#subClean').style.display = 'block';
+      document.querySelector('#subSleep').style.display = 'block';
+
+      document.querySelector('#foodDisplay').style.display = 'block';
+      document.querySelector('#cleanlinessDisplay').style.display = 'block';
+      document.querySelector('#sleepDisplay').style.display = 'block';
+      document.querySelector('#happinessDisplay').style.display = 'block';
+
+      document.querySelector('#foodDisplay').textContent = 'food: ' + currentObj.food;
+      document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
+      document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentObj.sleep;
+      document.querySelector('#happinessDisplay').textContent = 'happiness: ' + currentObj.happiness;
+
+      if (currentObj instanceof Queen) {
+        document.querySelector('#newBug').style.display = 'block';
+      }
+    } else if (currentObj instanceof FoodEntity) {
+      document.querySelector('#foodDisplay').style.display = 'block';
+      document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
+    }
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
     for (const bug of bugsList) {
@@ -175,23 +195,23 @@ window.addEventListener('load', () => {
 
   function addListeners() { // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
     const feedButton = document.querySelector('#plusFood');
-    feedButton.addEventListener('click', () => currentBug.increaseFood());
+    feedButton.addEventListener('click', () => currentObj.increaseFood());
     const cleanButton = document.querySelector('#plusClean');
-    cleanButton.addEventListener('click', () => currentBug.increaseCleanliness());
+    cleanButton.addEventListener('click', () => currentObj.increaseCleanliness());
     const sleepButton = document.querySelector('#plusSleep');
-    sleepButton.addEventListener('click', () => currentBug.increaseSleep());
+    sleepButton.addEventListener('click', () => currentObj.increaseSleep());
     const starveButton = document.querySelector('#subFood');
-    starveButton.addEventListener('click', () => currentBug.reduceFood());
+    starveButton.addEventListener('click', () => currentObj.reduceFood());
     const dirtyButton = document.querySelector('#subClean');
-    dirtyButton.addEventListener('click', () => currentBug.reduceCleanliness());
+    dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
     const tireButton = document.querySelector('#subSleep');
-    tireButton.addEventListener('click', () => currentBug.reduceSleep());
+    tireButton.addEventListener('click', () => currentObj.reduceSleep());
 
     const newBugButton = document.querySelector('#newBug');
     newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
 
     const canvas = document.getElementById('canvas1');
-    canvas.addEventListener('click', selectBug);
+    canvas.addEventListener('click', selectObject);
 
     canvas.addEventListener('mousemove', (e) => calculateMousePos(e)); // Doubt this'll work as intended. Will need somekind of setTimeout or running in the updateAll function. If so, then may not be possible to use event listeners.
     canvas.addEventListener('mouseup', toggleHold);
