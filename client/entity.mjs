@@ -58,14 +58,15 @@ export class FoodEntity extends Entity {
 }
 
 export class GravestoneEntity extends Entity {
-  constructor(bugObj) {
+  constructor(bugObj, cause) {
     super(bugObj);
-    this.x = bugObj.x;
-    this.y = bugObj.y;
+    this.ownerBug = bugObj;
+    this.x = this.ownerBug.x;
+    this.y = this.ownerBug.y;
     this.width = 30;
     this.height = 30;
 
-    this.name = bugObj.name + "'s grave";
+    this.name = this.ownerBug.name + "'s grave";
 
     this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
       left: this.x,
@@ -74,12 +75,18 @@ export class GravestoneEntity extends Entity {
       bottom: this.y + this.height,
     };
 
-    this.bugStats = {
-      bugBirthday: bugObj.birthday,
-      bugDeathday: new Date(),
-      bugTimeAlive: Math.floor((new Date() - bugObj.birthday) / 1000 / 60 / 60) + ':' + Math.floor((new Date() - bugObj.birthday) / 1000 / 60) + ':' + Math.floor((new Date() - bugObj.birthday) / 1000),
-    };
+    this.bugBirthday = this.ownerBug.birthday;
+    this.bugDeathday = new Date();
+    this.bugTimeAlive = this.calculateTimeAlive();
+    this.causeOfDeath = cause;
 
     this.image = document.querySelector('#gravestone_sprite');
+  }
+
+  calculateTimeAlive() {
+    const hours = Math.floor((new Date() - this.bugBirthday) / 1000 / 60 / 60);
+    const minutes = Math.floor((new Date() - this.bugBirthday) / 1000 / 60) - (60 * hours);
+    const seconds = Math.floor((new Date() - this.bugBirthday) / 1000) - (60 * minutes);
+    return { hours, minutes, seconds };
   }
 }

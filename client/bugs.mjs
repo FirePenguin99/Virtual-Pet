@@ -124,7 +124,6 @@ export class Bug {
       this.wanderTimer = 0;
 
       this.moveDestination = { x: ((Math.random() * 500 - 250 + this.x)), y: ((Math.random() * 500 - 250 + this.y)) };
-      console.log(this.moveDestination);
       this.behaviour = 'moving'; // We get him moving
 
       this.wanderInterval = (Math.random() * 10000);
@@ -132,7 +131,6 @@ export class Bug {
 
     if (this.behaviour === 'moving') {
       this.moveLerp(2);
-      // console.log(this.x + ", " + this.y);
     }
     this.wanderTimer += deltaTime;
   }

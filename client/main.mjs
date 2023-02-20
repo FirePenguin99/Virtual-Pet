@@ -129,7 +129,7 @@ window.addEventListener('load', () => {
   function bugDeath(bugObj, cause) {
     const bugIndex = bugsList.indexOf(bugObj);
     console.log('Your bug: ' + bugObj.name + ' has died due to a lack of ' + cause);
-    entityList.push(new GravestoneEntity(bugObj));
+    entityList.push(new GravestoneEntity(bugObj, cause));
     bugsList.splice(bugIndex, 1);
     bugNumber += -1;
   }
@@ -178,11 +178,13 @@ window.addEventListener('load', () => {
       document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
     } else if (currentObj instanceof GravestoneEntity) {
       document.querySelector('#birthdayDisplay').style.display = 'block';
-      document.querySelector('#birthdayDisplay').textContent = 'date of birth: ' + currentObj.bugStats.bugBirthday.getDate() + '/' + (currentObj.bugStats.bugBirthday.getMonth() + 1) + '/' + currentObj.bugStats.bugBirthday.getYear();
+      document.querySelector('#birthdayDisplay').textContent = 'date of birth: ' + currentObj.bugBirthday.getDate() + '/' + (currentObj.bugBirthday.getMonth() + 1) + '/' + currentObj.bugBirthday.getFullYear();
       document.querySelector('#deathdayDisplay').style.display = 'block';
-      document.querySelector('#deathdayDisplay').textContent = 'date of death: ' + currentObj.bugStats.bugDeathday.getDate() + '/' + (currentObj.bugStats.bugDeathday.getMonth() + 1) + '/' + currentObj.bugStats.bugDeathday.getYear();
+      document.querySelector('#deathdayDisplay').textContent = 'date of death: ' + currentObj.bugDeathday.getDate() + '/' + (currentObj.bugDeathday.getMonth() + 1) + '/' + currentObj.bugDeathday.getFullYear();
       document.querySelector('#timeAliveDisplay').style.display = 'block';
-      document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugStats.bugTimeAlive;
+      document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugTimeAlive.hours + ':' + currentObj.bugTimeAlive.minutes + ':' + currentObj.bugTimeAlive.seconds;
+      document.querySelector('#causeDisplay').style.display = 'block';
+      document.querySelector('#causeDisplay').textContent = 'cause of death: lack of ' + currentObj.causeOfDeath;
     }
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
