@@ -1,5 +1,5 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
-import { Entity, FoodEntity } from './entity.mjs';
+import { Entity, FoodEntity, GravestoneEntity } from './entity.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -13,7 +13,6 @@ window.addEventListener('load', () => {
   let canvasMousePos = { x: null, y: null };
   const visualOffset = { x: null, y: null };
   let oldPos = null;
-
 
   let previousTimeStamp = 0; // initialising previousTimeStamp for use in updateFrame()
 
@@ -130,6 +129,7 @@ window.addEventListener('load', () => {
   function bugDeath(bugObj, cause) {
     const bugIndex = bugsList.indexOf(bugObj);
     console.log('Your bug: ' + bugObj.name + ' has died due to a lack of ' + cause);
+    entityList.push(new GravestoneEntity(bugObj));
     bugsList.splice(bugIndex, 1);
     bugNumber += -1;
   }
@@ -176,6 +176,13 @@ window.addEventListener('load', () => {
     } else if (currentObj instanceof FoodEntity) {
       document.querySelector('#foodDisplay').style.display = 'block';
       document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
+    } else if (currentObj instanceof GravestoneEntity) {
+      document.querySelector('#birthdayDisplay').style.display = 'block';
+      document.querySelector('#birthdayDisplay').textContent = 'date of birth: ' + currentObj.bugStats.bugBirthday.getDate() + '/' + (currentObj.bugStats.bugBirthday.getMonth() + 1) + '/' + currentObj.bugStats.bugBirthday.getYear();
+      document.querySelector('#deathdayDisplay').style.display = 'block';
+      document.querySelector('#deathdayDisplay').textContent = 'date of death: ' + currentObj.bugStats.bugDeathday.getDate() + '/' + (currentObj.bugStats.bugDeathday.getMonth() + 1) + '/' + currentObj.bugStats.bugDeathday.getYear();
+      document.querySelector('#timeAliveDisplay').style.display = 'block';
+      document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugStats.bugTimeAlive;
     }
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.

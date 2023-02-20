@@ -1,5 +1,7 @@
 export class Bug {
   constructor(name, type, spawnX, spawnY, image) {
+    this.birthday = new Date();
+
     this.name = name;
     this.type = type;
     this.food = 50;
@@ -30,6 +32,11 @@ export class Bug {
   reduceFood() {
     this.food -= 2;
     document.querySelector('#foodDisplay').textContent = 'food: ' + this.food;
+  }
+
+  updateStat(stat, value) {
+    this.stat += value;
+    document.querySelector('#' + stat + 'Display').textContent = stat + ': ' + this.stat;
   }
 
   reduceCleanliness() {

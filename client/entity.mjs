@@ -56,3 +56,30 @@ export class FoodEntity extends Entity {
     this.image = document.querySelector('#food_resource_1');
   }
 }
+
+export class GravestoneEntity extends Entity {
+  constructor(bugObj) {
+    super(bugObj);
+    this.x = bugObj.x;
+    this.y = bugObj.y;
+    this.width = 30;
+    this.height = 30;
+
+    this.name = bugObj.name + "'s grave";
+
+    this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
+      left: this.x,
+      right: this.x + this.width,
+      top: this.y,
+      bottom: this.y + this.height,
+    };
+
+    this.bugStats = {
+      bugBirthday: bugObj.birthday,
+      bugDeathday: new Date(),
+      bugTimeAlive: Math.floor((new Date() - bugObj.birthday) / 1000 / 60 / 60) + ':' + Math.floor((new Date() - bugObj.birthday) / 1000 / 60) + ':' + Math.floor((new Date() - bugObj.birthday) / 1000),
+    };
+
+    this.image = document.querySelector('#gravestone_sprite');
+  }
+}
