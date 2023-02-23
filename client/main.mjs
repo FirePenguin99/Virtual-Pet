@@ -32,7 +32,7 @@ window.addEventListener('load', () => {
     // For clearing and redrawing the objects in the scene, as well as bug behaviour
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
 
-    ctx.fillStyle = '#000000'; // black void behind the map image
+    ctx.fillStyle = '#808080'; // black void behind the map image
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     mapObject.draw(ctx, visualOffset); // draw map image
@@ -132,6 +132,19 @@ window.addEventListener('load', () => {
     entityList.push(new GravestoneEntity(bugObj, cause));
     bugsList.splice(bugIndex, 1);
     bugNumber += -1;
+    if (currentObj === bugObj) {
+      currentObj = null;
+      UpdateStatDisplays();
+    }
+  }
+  function deleteGrave(graveObj) {
+    const graveIndex = entityList.indexOf(graveObj);
+    console.log('Cleaned ' + graveObj.name);
+    entityList.splice(graveIndex, 1);
+    if (currentObj === graveObj) {
+      currentObj = null;
+      UpdateStatDisplays();
+    }
   }
 
   function createNewEntity(newEntityType) {
@@ -146,6 +159,10 @@ window.addEventListener('load', () => {
     const childOfDiv = document.querySelector('#UI').children; // Hide all child elements of the UI div
     for (let index = 0; index < childOfDiv.length; index++) {
       childOfDiv[index].style.display = 'none';
+    }
+
+    if (currentObj === null) {
+      return;
     }
 
     document.querySelector('#nameDisplay').style.display = 'block';
@@ -185,6 +202,7 @@ window.addEventListener('load', () => {
       document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugTimeAlive.hours + ':' + currentObj.bugTimeAlive.minutes + ':' + currentObj.bugTimeAlive.seconds;
       document.querySelector('#causeDisplay').style.display = 'block';
       document.querySelector('#causeDisplay').textContent = 'cause of death: lack of ' + currentObj.causeOfDeath;
+      document.querySelector('#deleteGrave').style.display = 'block';
     }
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
@@ -218,6 +236,9 @@ window.addEventListener('load', () => {
 
     const newBugButton = document.querySelector('#newBug');
     newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
+
+    const deleteGraveButton = document.querySelector('#deleteGrave');
+    deleteGraveButton.addEventListener('click', () => deleteGrave(currentObj));
 
     const canvas = document.getElementById('canvas1');
     canvas.addEventListener('click', selectObject);
