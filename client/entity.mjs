@@ -57,6 +57,29 @@ export class FoodEntity extends Entity {
   }
 }
 
+export class FoodStorageBuilding extends Entity {
+  constructor(spawnX, spawnY) {
+    super();
+    this.x = spawnX;
+    this.y = spawnY;
+
+    this.width = 150;
+    this.height = 150;
+
+    this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
+      left: this.x,
+      right: this.x + this.width,
+      top: this.y,
+      bottom: this.y + this.height,
+    };
+
+    this.foodInventory = 0;
+
+    this.name = 'food storage';
+    this.image = document.querySelector('#food_storage_sprite');
+  }
+}
+
 export class GravestoneEntity extends Entity {
   constructor(bugObj, cause) {
     super(bugObj);

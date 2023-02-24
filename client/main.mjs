@@ -1,5 +1,5 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
-import { Entity, FoodEntity, GravestoneEntity } from './entity.mjs';
+import { Entity, FoodEntity, FoodStorageBuilding, GravestoneEntity } from './entity.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -16,11 +16,14 @@ window.addEventListener('load', () => {
 
   let previousTimeStamp = 0; // initialising previousTimeStamp for use in updateFrame()
 
+  const fpsCounter = document.querySelector('#fpsCounter');
+
   function updateFrame(timeStamp) { // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
     // calculate deltaTime
     if (timeStamp == null) { timeStamp = 16.6666; } // This is because in the first frame the timestamp == null for some reason. Therefore when it does, just set it to what the value would approximately be so it doesn't break the rest of the code.
     const deltaTime = timeStamp - previousTimeStamp;
     previousTimeStamp = timeStamp;
+    fpsCounter.textContent = 'FPS: ' + Math.floor(1000 / deltaTime);
 
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
@@ -39,7 +42,6 @@ window.addEventListener('load', () => {
 
     for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
       bug.draw(ctx, visualOffset);
-
       bug.wanderMovement(deltaTime); // logic for each bug's behaviour
     }
     for (const entity of entityList) { // Loop through array containing all Bugs, and call their draw() method.
@@ -62,6 +64,8 @@ window.addEventListener('load', () => {
   createNewBug('goob', 'queen');
 
   createNewEntity('food');
+
+  createNewBuilding('food_storage');
 
   addListeners();
   updateFrame();
@@ -152,6 +156,11 @@ window.addEventListener('load', () => {
       entityList.push(new FoodEntity(1000, 1000));
     }
   }
+  function createNewBuilding(newBuildingType) {
+    if (newBuildingType === 'food_storage') {
+      entityList.push(new FoodStorageBuilding(1500, 1000));
+    }
+  }
 
 
   function UpdateStatDisplays() {
@@ -190,7 +199,7 @@ window.addEventListener('load', () => {
       if (currentObj instanceof Queen) {
         document.querySelector('#newBug').style.display = 'block';
       }
-    } else if (currentObj instanceof FoodEntity) {
+    } else if (currentObj instanceof FoodEntity || currentObj instanceof FoodStorageBuilding) {
       document.querySelector('#foodDisplay').style.display = 'block';
       document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
     } else if (currentObj instanceof GravestoneEntity) {
