@@ -23,10 +23,14 @@ export class Bug {
       bottom: this.y + this.height,
     };
 
-    this.behaviour = 'wants_to_wander';
+    this.behaviour = 'wandering';
+    this.movingState = 'idle';
     this.wanderInterval = 2000;
     this.wanderTimer = 0;
     this.moveDestination = { x: null, y: null };
+
+    this.harvestTarget = null;
+    this.storeTarget = null;
   }
 
   reduceFood() {
@@ -95,7 +99,12 @@ export class Bug {
 
   moveLerp(overallSpeed) { // speed is amount per second
     if (this.moveDestination.x === this.x && this.moveDestination.y === this.y) { // If the bug is at its destination then break
-      this.behaviour = 'wants_to_wander';
+      this.movingState = 'idle';
+      if (this.behaviour === 'harvesting') {
+        this.behaviour = 'storing';
+      } else if (this.behaviour === 'storing') {
+        this.behaviour = 'harvesting';
+      }
       return;
     }
 
@@ -109,7 +118,7 @@ export class Bug {
       this.x = this.moveDestination.x;
       this.y = this.moveDestination.y;
 
-      this.behaviour = 'wants_to_wander';
+      this.movingState = 'idle';
       return;
     }
 
@@ -119,20 +128,30 @@ export class Bug {
     this.recalculateBounds(); // bug has moved, and therefore must recalculate its bounds so it can be clicked on correctly
   }
 
-  wanderMovement(deltaTime) {
-    if (this.wanderTimer > this.wanderInterval) { // If the wander timer is up, and the bug is ready to begin wandering:
-      this.wanderTimer = 0;
+  behaviourLogic(deltaTime) {
+    if (this.behaviour === 'wandering') {
+      if (this.wanderTimer > this.wanderInterval) { // If the wander timer is up, and the bug is ready to begin wandering:
+        this.wanderTimer = 0;
 
-      this.moveDestination = { x: ((Math.random() * 500 - 250 + this.x)), y: ((Math.random() * 500 - 250 + this.y)) };
-      this.behaviour = 'moving'; // We get him moving
+        this.moveDestination = { x: ((Math.random() * 500 - 250 + this.x)), y: ((Math.random() * 500 - 250 + this.y)) };
+        this.movingState = 'moving'; // We get him moving. Don't call moveLerp here, as this section only occurs once every time the wander timer has ran out, therefore won't activate every frame.
 
-      this.wanderInterval = (Math.random() * 10000);
+        this.wanderInterval = (Math.random() * 10000);
+      }
+      this.wanderTimer += deltaTime;
+    } else if (this.behaviour === 'harvesting') { // if harvesting then set its movement target to the coords of the harvest target
+      this.moveDestination.x = this.harvestTarget.x;
+      this.moveDestination.y = this.harvestTarget.y;
+      this.movingState = 'moving';
+    } else if (this.behaviour === 'storing') { // if storing then set its movement target to the coords of the storing target
+      this.moveDestination.x = this.storeTarget.x;
+      this.moveDestination.y = this.storeTarget.y;
+      this.movingState = 'moving';
     }
 
-    if (this.behaviour === 'moving') {
+    if (this.movingState === 'moving') {
       this.moveLerp(2);
     }
-    this.wanderTimer += deltaTime;
   }
 }
 

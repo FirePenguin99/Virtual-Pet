@@ -55,6 +55,10 @@ export class FoodEntity extends Entity {
     this.name = 'large leaf';
     this.image = document.querySelector('#food_resource_1');
   }
+
+  decreaseFood(amount) {
+    this.foodInventory -= amount;
+  }
 }
 
 export class FoodStorageBuilding extends Entity {
@@ -77,6 +81,14 @@ export class FoodStorageBuilding extends Entity {
 
     this.name = 'food storage';
     this.image = document.querySelector('#food_storage_sprite');
+  }
+
+  increaseFood(amount) {
+    this.foodInventory += amount;
+  }
+
+  decreaseFood(amount) {
+    this.foodInventory -= amount;
   }
 }
 

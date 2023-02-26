@@ -15,7 +15,6 @@ window.addEventListener('load', () => {
   let oldPos = null;
 
   let previousTimeStamp = 0; // initialising previousTimeStamp for use in updateFrame()
-
   const fpsCounter = document.querySelector('#fpsCounter');
 
   function updateFrame(timeStamp) { // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
@@ -25,6 +24,7 @@ window.addEventListener('load', () => {
     previousTimeStamp = timeStamp;
     fpsCounter.textContent = 'FPS: ' + Math.floor(1000 / deltaTime);
 
+    // set the canvas dimensions to the dimensions of the window
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
@@ -42,7 +42,7 @@ window.addEventListener('load', () => {
 
     for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
       bug.draw(ctx, visualOffset);
-      bug.wanderMovement(deltaTime); // logic for each bug's behaviour
+      bug.behaviourLogic(deltaTime); // logic for each bug's behaviour
     }
     for (const entity of entityList) { // Loop through array containing all Bugs, and call their draw() method.
       entity.draw(ctx, visualOffset);
@@ -66,6 +66,10 @@ window.addEventListener('load', () => {
   createNewEntity('food');
 
   createNewBuilding('food_storage');
+
+  bugsList[0].behaviour = 'harvesting';
+  bugsList[0].harvestTarget = entityList[0];
+  bugsList[0].storeTarget = entityList[1];
 
   addListeners();
   updateFrame();
