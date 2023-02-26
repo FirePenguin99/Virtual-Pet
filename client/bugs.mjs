@@ -31,6 +31,7 @@ export class Bug {
 
     this.harvestTarget = null;
     this.storeTarget = null;
+    this.foodInventory = 0;
   }
 
   reduceFood() {
@@ -101,9 +102,9 @@ export class Bug {
     if (this.moveDestination.x === this.x && this.moveDestination.y === this.y) { // If the bug is at its destination then break
       this.movingState = 'idle';
       if (this.behaviour === 'harvesting') {
-        this.behaviour = 'storing';
+        this.withdrawFood(10);
       } else if (this.behaviour === 'storing') {
-        this.behaviour = 'harvesting';
+        this.depositFood(10);
       }
       return;
     }
@@ -152,6 +153,22 @@ export class Bug {
     if (this.movingState === 'moving') {
       this.moveLerp(2);
     }
+  }
+
+  withdrawFood(amount) {
+    if (this.harvestTarget.foodInventory <= 0) {
+      this.behaviour = 'wandering';
+    } else {
+      this.harvestTarget.decreaseFood(amount);
+      this.foodInventory += amount;
+      this.behaviour = 'storing';
+    }
+  }
+
+  depositFood(amount) {
+    this.storeTarget.increaseFood(amount);
+    this.foodInventory -= amount;
+    this.behaviour = 'harvesting';
   }
 }
 
