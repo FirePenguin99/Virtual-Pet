@@ -17,14 +17,14 @@ export class Bug {
     this.image = image;
 
     this.bounds = {
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
 
-    this.behaviour = 'wandering';
-    this.movingState = 'idle';
+    this.behaviour = 'wandering'; // describes the actions the bug wants to do or is currently doing
+    this.movingState = 'idle'; // describes if the bug is moving or idle
     this.wanderInterval = 2000;
     this.wanderTimer = 0;
     this.moveDestination = { x: null, y: null };
@@ -85,15 +85,15 @@ export class Bug {
 
 
   draw(context, offset) {
-    context.drawImage(this.image, this.x + offset.x, this.y + offset.y, this.width, this.height); // Adds actual position with visual offset from moving the camera/map.
+    context.drawImage(this.image, this.x + offset.x - (this.width / 2), this.y + offset.y - (this.height / 2), this.width, this.height); // Adds actual position with visual offset from moving the camera/map. Subtracting the half height and width makes the x and y coords of the bug represent it's center, rather than top left edge.
   }
 
   recalculateBounds() {
     this.bounds = {
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y + (this.height / 2),
+      bottom: this.y - (this.height / 2),
     };
   }
 

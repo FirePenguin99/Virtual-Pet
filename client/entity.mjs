@@ -19,7 +19,8 @@ export class Entity {
   }
 
   draw(context, offset) {
-    context.drawImage(this.image, this.x + offset.x, this.y + offset.y, this.width, this.height); // Adds actual position with visual offset from moving the camera/map.
+    context.drawImage(this.image, this.x + offset.x - (this.width / 2), this.y + offset.y - (this.height / 2), this.width, this.height); // Adds actual position with visual offset from moving the camera/map. Subtracting the half height and width makes the x and y coords of the bug represent it's center, rather than top left edge.
+    context.fillRect(this.x + offset.x, this.y + offset.y, 5, 5);
   }
 
   recalculateBounds() {

@@ -53,7 +53,7 @@ window.addEventListener('load', () => {
   }
 
 
-  const mapObject = new Entity('map', -550, -400, mapImage);
+  const mapObject = new Entity('map', 1000, 500, mapImage);
 
 
   let currentObj;
