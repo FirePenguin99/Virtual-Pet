@@ -157,7 +157,7 @@ export class Bug {
 
   setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
     if (arguments.length === 0) {
-      return;
+      // return;
     } else if (arguments[0] === 'wandering') {
       this.behaviour = 'wandering';
       this.movingState = 'idle'; // describes if the bug is moving or idle

@@ -70,7 +70,7 @@ window.addEventListener('load', () => {
   createNewEntity('food');
   createNewBuilding('food_storage');
 
-  // bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
+  bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
 
   addListeners();
   updateFrame();
@@ -183,18 +183,10 @@ window.addEventListener('load', () => {
     document.querySelector('#nameDisplay').textContent = 'name: ' + currentObj.name;
 
     if (currentObj instanceof Bug) { // Show and update only the relevent child elements
-      document.querySelector('#plusFood').style.display = 'block';
-      document.querySelector('#plusClean').style.display = 'block';
-      document.querySelector('#plusSleep').style.display = 'block';
-
-      document.querySelector('#subFood').style.display = 'block';
-      document.querySelector('#subClean').style.display = 'block';
-      document.querySelector('#subSleep').style.display = 'block';
+      document.querySelector('#bugButtons').style.display = 'block';
 
       document.querySelector('#foodDisplay').style.display = 'block';
-      document.querySelector('#cleanlinessDisplay').style.display = 'block';
-      document.querySelector('#sleepDisplay').style.display = 'block';
-      document.querySelector('#happinessDisplay').style.display = 'block';
+      document.querySelector('#bugStats').style.display = 'block';
 
       document.querySelector('#foodDisplay').textContent = 'food: ' + currentObj.food;
       document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
@@ -208,15 +200,11 @@ window.addEventListener('load', () => {
       document.querySelector('#foodDisplay').style.display = 'block';
       document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
     } else if (currentObj instanceof GravestoneEntity) {
-      document.querySelector('#birthdayDisplay').style.display = 'block';
+      document.querySelector('#graveElems').style.display = 'block';
       document.querySelector('#birthdayDisplay').textContent = 'date of birth: ' + currentObj.bugBirthday.getDate() + '/' + (currentObj.bugBirthday.getMonth() + 1) + '/' + currentObj.bugBirthday.getFullYear();
-      document.querySelector('#deathdayDisplay').style.display = 'block';
       document.querySelector('#deathdayDisplay').textContent = 'date of death: ' + currentObj.bugDeathday.getDate() + '/' + (currentObj.bugDeathday.getMonth() + 1) + '/' + currentObj.bugDeathday.getFullYear();
-      document.querySelector('#timeAliveDisplay').style.display = 'block';
       document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugTimeAlive.hours + ':' + currentObj.bugTimeAlive.minutes + ':' + currentObj.bugTimeAlive.seconds;
-      document.querySelector('#causeDisplay').style.display = 'block';
       document.querySelector('#causeDisplay').textContent = 'cause of death: lack of ' + currentObj.causeOfDeath;
-      document.querySelector('#deleteGrave').style.display = 'block';
     }
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
