@@ -42,19 +42,16 @@ window.addEventListener('load', () => {
 
     for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
       bug.draw(ctx, visualOffset);
-      bug.behaviourLogic(deltaTime); // logic for each bug's behaviour
+      bug.runBehaviourLogic(deltaTime); // logic for each bug's behaviour
     }
     for (const entity of entityList) { // Loop through array containing all Bugs, and call their draw() method.
       entity.draw(ctx, visualOffset);
     }
 
-    // call the function again
-    requestAnimationFrame(updateFrame);
+    requestAnimationFrame(updateFrame); // call the function again
   }
 
-
   const mapObject = new Entity('map', 1000, 500, mapImage);
-
 
   let currentObj;
   const bugsList = [];
@@ -67,9 +64,7 @@ window.addEventListener('load', () => {
 
   createNewBuilding('food_storage');
 
-  bugsList[0].behaviour = 'harvesting';
-  bugsList[0].harvestTarget = entityList[0];
-  bugsList[0].storeTarget = entityList[1];
+  bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
 
   addListeners();
   updateFrame();

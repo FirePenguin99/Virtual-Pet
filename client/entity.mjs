@@ -11,24 +11,29 @@ export class Entity {
     this.image = image;
 
     this.bounds = {
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
   }
 
   draw(context, offset) {
     context.drawImage(this.image, this.x + offset.x - (this.width / 2), this.y + offset.y - (this.height / 2), this.width, this.height); // Adds actual position with visual offset from moving the camera/map. Subtracting the half height and width makes the x and y coords of the bug represent it's center, rather than top left edge.
-    context.fillRect(this.x + offset.x, this.y + offset.y, 5, 5);
+    // context.fillRect(this.x + offset.x, this.y + offset.y, 5, 5);
+
+    // context.fillRect(this.bounds.left + offset.x, this.bounds.top + offset.y, 5, 5); // top left
+    // context.fillRect(this.bounds.right + offset.x, this.bounds.top + offset.y, 5, 5); // top right
+    // context.fillRect(this.bounds.left + offset.x, this.bounds.bottom + offset.y, 5, 5); // bottom left
+    // context.fillRect(this.bounds.right + offset.x, this.bounds.bottom + offset.y, 5, 5); // bottom right
   }
 
   recalculateBounds() {
     this.bounds = {
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
   }
 }
@@ -45,10 +50,10 @@ export class FoodEntity extends Entity {
     this.height = 65;
 
     this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
 
     this.foodInventory = 100;
@@ -72,10 +77,10 @@ export class FoodStorageBuilding extends Entity {
     this.height = 150;
 
     this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
 
     this.foodInventory = 0;
@@ -105,10 +110,10 @@ export class GravestoneEntity extends Entity {
     this.name = this.ownerBug.name + "'s grave";
 
     this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
-      left: this.x,
-      right: this.x + this.width,
-      top: this.y,
-      bottom: this.y + this.height,
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
 
     this.bugBirthday = this.ownerBug.birthday;

@@ -92,8 +92,8 @@ export class Bug {
     this.bounds = {
       left: this.x - (this.width / 2),
       right: this.x + (this.width / 2),
-      top: this.y + (this.height / 2),
-      bottom: this.y - (this.height / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
     };
   }
 
@@ -129,7 +129,7 @@ export class Bug {
     this.recalculateBounds(); // bug has moved, and therefore must recalculate its bounds so it can be clicked on correctly
   }
 
-  behaviourLogic(deltaTime) {
+  runBehaviourLogic(deltaTime) {
     if (this.behaviour === 'wandering') {
       if (this.wanderTimer > this.wanderInterval) { // If the wander timer is up, and the bug is ready to begin wandering:
         this.wanderTimer = 0;
@@ -152,6 +152,21 @@ export class Bug {
 
     if (this.movingState === 'moving') {
       this.moveLerp(2);
+    }
+  }
+
+  setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
+    if (arguments.length === 0) {
+      return;
+    } else if (arguments[0] === 'wandering') {
+      this.behaviour = 'wandering';
+      this.movingState = 'idle'; // describes if the bug is moving or idle
+      this.wanderInterval = 2000;
+      this.wanderTimer = 0;
+    } else if (arguments[0] === 'harvesting') {
+      this.behaviour = 'harvesting';
+      this.harvestTarget = arguments[1];
+      this.storeTarget = arguments[2];
     }
   }
 
