@@ -1,12 +1,12 @@
 export class Entity {
-  constructor(name, spawnX, spawnY, image) {
+  constructor(name, spawnX, spawnY, width, height, image) {
     this.name = name;
 
     this.x = spawnX;
     this.y = spawnY;
 
-    this.width = 3000;
-    this.height = 3000;
+    this.width = width;
+    this.height = height;
 
     this.image = image;
 
@@ -129,5 +129,25 @@ export class GravestoneEntity extends Entity {
     const minutes = Math.floor((new Date() - this.bugBirthday) / 1000 / 60) - (60 * hours);
     const seconds = Math.floor((new Date() - this.bugBirthday) / 1000) - (60 * minutes);
     return { hours, minutes, seconds };
+  }
+}
+
+export class SelectionEntity extends Entity {
+  constructor(name) {
+    super(name);
+    this.bounds = null;
+    this.image = document.querySelector('#selection_sprite');
+  }
+
+  drawSelectedObject(currentObj, context, offset) {
+    if (currentObj === null) {
+      return;
+    }
+    this.x = currentObj.x;
+    this.y = currentObj.y + (currentObj.height / 2); // moves to the bottom of the selected object
+    this.width = currentObj.width * 1.1;
+    this.height = currentObj.width * 1.1 / 3;
+
+    this.draw(context, offset);
   }
 }

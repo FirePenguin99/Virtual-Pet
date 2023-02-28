@@ -1,5 +1,5 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
-import { Entity, FoodEntity, FoodStorageBuilding, GravestoneEntity } from './entity.mjs';
+import { Entity, FoodEntity, FoodStorageBuilding, GravestoneEntity, SelectionEntity } from './entity.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -40,6 +40,8 @@ window.addEventListener('load', () => {
 
     mapObject.draw(ctx, visualOffset); // draw map image
 
+    selectEntity.drawSelectedObject(currentObj, ctx, visualOffset);
+
     for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
       bug.draw(ctx, visualOffset);
       bug.runBehaviourLogic(deltaTime); // logic for each bug's behaviour
@@ -51,20 +53,24 @@ window.addEventListener('load', () => {
     requestAnimationFrame(updateFrame); // call the function again
   }
 
-  const mapObject = new Entity('map', 1000, 500, mapImage);
+  const mapObject = new Entity('map', 1000, 500, 3000, 3000, mapImage);
 
   let currentObj;
   const bugsList = [];
   const entityList = [];
   let bugNumber = 0;
 
+  const selectEntity = new SelectionEntity('selection');
+
   createNewBug('goob', 'queen');
 
-  createNewEntity('food');
+  createNewEntity('selection');
+  console.log(entityList);
 
+  createNewEntity('food');
   createNewBuilding('food_storage');
 
-  bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
+  // bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
 
   addListeners();
   updateFrame();
