@@ -133,8 +133,9 @@ export class GravestoneEntity extends Entity {
 }
 
 export class SelectionEntity extends Entity {
-  constructor(name) {
-    super(name);
+  constructor() {
+    super();
+    this.name = 'selection';
     this.bounds = null;
     this.image = document.querySelector('#selection_sprite');
   }

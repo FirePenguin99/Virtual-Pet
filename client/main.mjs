@@ -8,6 +8,9 @@ window.addEventListener('load', () => {
 
   const mapImage = document.querySelector('#map');
 
+  let toggleHarvestSelecting = false;
+  const selectedForHarvest = [];
+
   // Variables for mouse movement and map movement
   let mouseHold = false;
   let canvasMousePos = { x: null, y: null };
@@ -32,10 +35,14 @@ window.addEventListener('load', () => {
       moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
     }
 
+    if (toggleHarvestSelecting) {
+      harvestLogic();
+    }
+
     // For clearing and redrawing the objects in the scene, as well as bug behaviour
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
 
-    ctx.fillStyle = '#808080'; // black void behind the map image
+    ctx.fillStyle = '#808080'; // grey void behind the map image
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     mapObject.draw(ctx, visualOffset); // draw map image
@@ -46,7 +53,7 @@ window.addEventListener('load', () => {
       bug.draw(ctx, visualOffset);
       bug.runBehaviourLogic(deltaTime); // logic for each bug's behaviour
     }
-    for (const entity of entityList) { // Loop through array containing all Bugs, and call their draw() method.
+    for (const entity of entityList) { // Loop through array containing all Entities, and call their draw() method.
       entity.draw(ctx, visualOffset);
     }
 
@@ -60,7 +67,7 @@ window.addEventListener('load', () => {
   const entityList = [];
   let bugNumber = 0;
 
-  const selectEntity = new SelectionEntity('selection');
+  const selectEntity = new SelectionEntity();
 
   createNewBug('goob', 'queen');
 
@@ -70,7 +77,8 @@ window.addEventListener('load', () => {
   createNewEntity('food');
   createNewBuilding('food_storage');
 
-  bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
+  // bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
+
 
   addListeners();
   updateFrame();
@@ -80,17 +88,25 @@ window.addEventListener('load', () => {
   function selectObject() { // It compares the returned value of getMousePosition and compares it to the corner co-ordinates of all bugs in the game (probably slow).
     const bugsAndEntity = bugsList.concat(entityList); // combine bugs and entity arrays
     for (const obj of bugsAndEntity) {
-      if (canvasMousePos.x >= obj.bounds.left + visualOffset.x && canvasMousePos.x <= obj.bounds.right + visualOffset.x && canvasMousePos.y >= obj.bounds.top + visualOffset.y && canvasMousePos.y <= obj.bounds.bottom + visualOffset.y) {
-      // Adds visualOffset to the bound calculates, rather than the bounds itself. This prevents the bug's bounds not being able to be used in collision detection later on, And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and vusyal feature) only makes sense. If canvasMousePos is within the bounds of a Bug, set currentObj as the currently iterated bug, and log it's name.
+      if (canvasMousePos.x >= obj.bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
+        canvasMousePos.x <= obj.bounds.right + visualOffset.x && // This prevents the bug's bounds not being able to be used in collision detection later on, And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and visual feature) only makes sense.
+        canvasMousePos.y >= obj.bounds.top + visualOffset.y && // If canvasMousePos is within the bounds of a Bug, set currentObj as the currently iterated bug, and log it's name.
+        canvasMousePos.y <= obj.bounds.bottom + visualOffset.y) {
         console.log(obj.name);
-        currentObj = obj;
-        UpdateStatDisplays();
-        return;
+
+        if (toggleHarvestSelecting) { // if selecting is in harvest mode,
+          selectedForHarvest.push(obj);
+        } else { // if selecting is in normal mode,
+          currentObj = obj;
+          UpdateStatDisplays();
+          return;
+        }
       } else {
         console.log("No bug 'ere");
       }
     }
   }
+
   function toggleHold() { // Called by event listeners on mouse down and mouse up. Toggles a bool variable which represents the mouse's state
     mouseHold = !mouseHold;
     oldPos = null;
@@ -155,6 +171,40 @@ window.addEventListener('load', () => {
       UpdateStatDisplays();
     }
   }
+  function harvestSelecting() {
+    if (currentObj.behaviour !== 'harvesting') {
+      toggleHarvestSelecting = true;
+      UpdateStatDisplays();
+    } else {
+      currentObj.setBehaviour('wandering');
+      document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
+    }
+  }
+  function harvestLogic() {
+    document.querySelector('#harvestBugName').textContent = currentObj.name;
+    if (selectedForHarvest[0] instanceof FoodEntity) {
+      // works
+      document.querySelector('#foodSourceName').textContent = selectedForHarvest[0].name;
+      document.querySelector('#harvestAlert').textContent = 'Select the food storage building for food to be deposited into';
+    } else {
+      selectedForHarvest.splice(0, 1);
+      document.querySelector('#foodSourceName').textContent = '--';
+      document.querySelector('#harvestAlert').textContent = 'Select the food source target';
+      return;
+    }
+    if (selectedForHarvest[1] instanceof FoodStorageBuilding) {
+      // works
+      document.querySelector('#foodStorageName').textContent = selectedForHarvest[1].name;
+      toggleHarvestSelecting = false;
+      currentObj.setBehaviour('harvesting', selectedForHarvest[0], selectedForHarvest[1]);
+      selectedForHarvest.splice(0, selectedForHarvest.length); // clear entire array for reuse later
+      UpdateStatDisplays();
+    } else {
+      selectedForHarvest.splice(1, 1);
+      document.querySelector('#foodStorageName').textContent = '--';
+      document.querySelector('#harvestAlert').textContent = 'Select the food storage building for food to be deposited into';
+    }
+  }
 
   function createNewEntity(newEntityType) {
     if (newEntityType === 'food') {
@@ -179,6 +229,11 @@ window.addEventListener('load', () => {
       return;
     }
 
+    if (toggleHarvestSelecting) {
+      document.querySelector('#harvestingElems').style.display = 'block';
+      return;
+    }
+
     document.querySelector('#nameDisplay').style.display = 'block';
     document.querySelector('#nameDisplay').textContent = 'name: ' + currentObj.name;
 
@@ -192,6 +247,12 @@ window.addEventListener('load', () => {
       document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
       document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentObj.sleep;
       document.querySelector('#happinessDisplay').textContent = 'happiness: ' + currentObj.happiness;
+
+      if (currentObj.behaviour === 'harvesting') {
+        document.querySelector('#startHarvest').textContent = 'Press to cancel harvesting';
+      } else {
+        document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
+      }
 
       if (currentObj instanceof Queen) {
         document.querySelector('#newBug').style.display = 'block';
@@ -241,6 +302,9 @@ window.addEventListener('load', () => {
 
     const deleteGraveButton = document.querySelector('#deleteGrave');
     deleteGraveButton.addEventListener('click', () => deleteGrave(currentObj));
+
+    const toggleHarvestButton = document.querySelector('#startHarvest');
+    toggleHarvestButton.addEventListener('click', harvestSelecting);
 
     const canvas = document.getElementById('canvas1');
     canvas.addEventListener('click', selectObject);
