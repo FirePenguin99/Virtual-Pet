@@ -35,10 +35,6 @@ window.addEventListener('load', () => {
       moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
     }
 
-    if (toggleHarvestSelecting) {
-      harvestLogic();
-    }
-
     // For clearing and redrawing the objects in the scene, as well as bug behaviour
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
 
@@ -96,6 +92,7 @@ window.addEventListener('load', () => {
 
         if (toggleHarvestSelecting) { // if selecting is in harvest mode,
           selectedForHarvest.push(obj);
+          harvestLogic();
         } else { // if selecting is in normal mode,
           currentObj = obj;
           UpdateStatDisplays();
