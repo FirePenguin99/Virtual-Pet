@@ -8,6 +8,7 @@ export class Bug {
     this.sleep = 50;
     this.cleanliness = 50;
     this.happiness = 50;
+    this.speed = 2;
 
     this.x = spawnX;
     this.y = spawnY;
@@ -32,16 +33,13 @@ export class Bug {
     this.harvestTarget = null;
     this.storeTarget = null;
     this.foodInventory = 0;
+
+    this.denTarget = null;
   }
 
   reduceFood() {
     this.food -= 2;
     document.querySelector('#foodDisplay').textContent = 'food: ' + this.food;
-  }
-
-  updateStat(stat, value) {
-    this.stat += value;
-    document.querySelector('#' + stat + 'Display').textContent = stat + ': ' + this.stat;
   }
 
   reduceCleanliness() {
@@ -54,24 +52,24 @@ export class Bug {
     document.querySelector('#sleepDisplay').textContent = 'sleep: ' + this.sleep;
   }
 
-  increaseFood() {
-    this.food += 2;
+  increaseFood(amount) {
+    this.food += amount;
     if (this.food > 100) { // Sets max number to 100
       this.food = 100;
     }
     document.querySelector('#foodDisplay').textContent = 'food: ' + this.food;
   }
 
-  increaseCleanliness() {
-    this.cleanliness += 2;
+  increaseCleanliness(amount) {
+    this.cleanliness += amount;
     if (this.cleanliness > 100) { // Sets max number to 100
       this.cleanliness = 100;
     }
     document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + this.cleanliness;
   }
 
-  increaseSleep() {
-    this.sleep += 2;
+  increaseSleep(amount) {
+    this.sleep += amount;
     if (this.sleep > 100) { // Sets max number to 100
       this.sleep = 100;
     }
@@ -105,6 +103,8 @@ export class Bug {
         this.withdrawFood(10);
       } else if (this.behaviour === 'storing') {
         this.depositFood(10);
+      } else if (this.behaviour === 'moveToDen') {
+        this.enterDen();
       }
       return;
     }
@@ -131,28 +131,62 @@ export class Bug {
 
   runBehaviourLogic(deltaTime) {
     if (this.behaviour === 'wandering') {
-      if (this.wanderTimer > this.wanderInterval) { // If the wander timer is up, and the bug is ready to begin wandering:
-        this.wanderTimer = 0;
-
-        this.moveDestination = { x: ((Math.random() * 500 - 250 + this.x)), y: ((Math.random() * 500 - 250 + this.y)) };
-        this.movingState = 'moving'; // We get him moving. Don't call moveLerp here, as this section only occurs once every time the wander timer has ran out, therefore won't activate every frame.
-
-        this.wanderInterval = (Math.random() * 10000);
-      }
-      this.wanderTimer += deltaTime;
+      this.wanderingBehaviour(deltaTime);
     } else if (this.behaviour === 'harvesting') { // if harvesting then set its movement target to the coords of the harvest target
-      this.moveDestination.x = this.harvestTarget.x;
-      this.moveDestination.y = this.harvestTarget.y;
-      this.movingState = 'moving';
+      this.harvestingBehaviour();
     } else if (this.behaviour === 'storing') { // if storing then set its movement target to the coords of the storing target
-      this.moveDestination.x = this.storeTarget.x;
-      this.moveDestination.y = this.storeTarget.y;
-      this.movingState = 'moving';
+      this.storingBehaviour();
+    } else if (this.behaviour === 'sleeping') {
+      this.sleepingBehaviour(deltaTime);
+    } else if (this.behaviour === 'moveToDen') {
+      this.moveToDenBehaviour();
     }
 
     if (this.movingState === 'moving') {
-      this.moveLerp(2);
+      this.moveLerp(this.speed);
     }
+  }
+
+  wanderingBehaviour(deltaTime) {
+    if (this.wanderTimer > this.wanderInterval) { // If the wander timer is up, and the bug is ready to begin wandering:
+      this.wanderTimer = 0;
+
+      this.moveDestination = { x: ((Math.random() * 500 - 250 + this.x)), y: ((Math.random() * 500 - 250 + this.y)) };
+      this.movingState = 'moving'; // We get him moving. Don't call moveLerp here, as this section only occurs once every time the wander timer has ran out, therefore won't activate every frame.
+
+      this.wanderInterval = (Math.random() * 10000);
+    }
+    this.wanderTimer += deltaTime;
+  }
+
+  harvestingBehaviour() {
+    this.moveDestination.x = this.harvestTarget.x;
+    this.moveDestination.y = this.harvestTarget.y;
+    this.movingState = 'moving';
+  }
+
+  storingBehaviour() {
+    this.moveDestination.x = this.storeTarget.x;
+    this.moveDestination.y = this.storeTarget.y;
+    this.movingState = 'moving';
+  }
+
+  sleepingBehaviour() {
+    if (this.sleep >= 100) {
+      this.denTarget.removeTenant(this);
+    } else {
+      this.movingState = 'idle';
+    }
+  }
+
+  moveToDenBehaviour() {
+    this.moveDestination.x = this.denTarget.x;
+    this.moveDestination.y = this.denTarget.y;
+    this.movingState = 'moving';
+  }
+
+  enterDen() {
+    this.denTarget.addTenant(this);
   }
 
   setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
@@ -167,8 +201,14 @@ export class Bug {
       this.behaviour = 'harvesting';
       this.harvestTarget = arguments[1];
       this.storeTarget = arguments[2];
+    } else if (arguments[0] === 'sleeping') {
+      this.behaviour = 'sleeping';
+    } else if (arguments[0] === 'moveToDen') {
+      this.behaviour = 'moveToDen';
+      this.denTarget = arguments[1];
     }
   }
+
 
   withdrawFood(amount) {
     if (this.harvestTarget.foodInventory <= 0) {

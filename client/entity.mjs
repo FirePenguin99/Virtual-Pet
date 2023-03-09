@@ -98,6 +98,54 @@ export class FoodStorageBuilding extends Entity {
   }
 }
 
+export class SleepingDenBuilding extends Entity {
+  constructor(spawnX, spawnY) {
+    super();
+    this.x = spawnX;
+    this.y = spawnY;
+
+    this.width = 150;
+    this.height = 100;
+
+    this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
+    };
+
+    this.occupancy = 0;
+    this.maxOccupancy = 5;
+    this.tenants = [];
+
+    this.name = 'sleeping den';
+    this.image = document.querySelector('#sleeping_den_sprite');
+  }
+
+  addTenant(bugObj) {
+    if (this.occupancy === this.maxOccupancy) {
+      console.log('den is full');
+    } else {
+      this.tenants.push(bugObj);
+      this.occupancy += 1;
+      bugObj.x = 10000;
+      bugObj.y = 10000; // teleport bug far away to look like they've entered the den
+      bugObj.recalculateBounds();
+      bugObj.setBehaviour('sleeping');
+    }
+  }
+
+  removeTenant(bugObj) {
+    this.tenants.push(bugObj);
+    const tenantIndex = this.tenants.indexOf(bugObj);
+    this.tenants.splice(tenantIndex, 1);
+    this.occupancy -= 1;
+    bugObj.x = this.x;
+    bugObj.y = this.y; // teleport bug back to the den to look like they've left the den
+    bugObj.setBehaviour('wandering');
+  }
+}
+
 export class GravestoneEntity extends Entity {
   constructor(bugObj, cause) {
     super(bugObj);

@@ -1,5 +1,5 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
-import { Entity, FoodEntity, FoodStorageBuilding, GravestoneEntity, SelectionEntity } from './entity.mjs';
+import { Entity, FoodEntity, FoodStorageBuilding, GravestoneEntity, SelectionEntity, SleepingDenBuilding } from './entity.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -21,13 +21,13 @@ window.addEventListener('load', () => {
   const fpsCounter = document.querySelector('#fpsCounter');
 
   function updateFrame(timeStamp) { // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
-    // calculate deltaTime
+    //  ---- calculate deltaTime ----
     if (timeStamp == null) { timeStamp = 16.6666; } // This is because in the first frame the timestamp == null for some reason. Therefore when it does, just set it to what the value would approximately be so it doesn't break the rest of the code.
     const deltaTime = timeStamp - previousTimeStamp;
     previousTimeStamp = timeStamp;
     fpsCounter.textContent = 'FPS: ' + Math.floor(1000 / deltaTime);
 
-    // set the canvas dimensions to the dimensions of the window
+    //  ---- set the canvas dimensions to the dimensions of the window ----
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
@@ -35,7 +35,7 @@ window.addEventListener('load', () => {
       moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
     }
 
-    // For clearing and redrawing the objects in the scene, as well as bug behaviour
+    // ---- For clearing and redrawing the objects in the scene, as well as bug behaviour  ----
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
 
     ctx.fillStyle = '#808080'; // grey void behind the map image
@@ -73,15 +73,14 @@ window.addEventListener('load', () => {
   createNewEntity('food');
   createNewBuilding('food_storage');
 
-  // bugsList[0].setBehaviour('harvesting', entityList[0], entityList[1]);
-
+  createNewBuilding('sleeping_den');
 
   addListeners();
   updateFrame();
   decreaseStatsInterval();
 
 
-  function selectObject() { // It compares the returned value of getMousePosition and compares it to the corner co-ordinates of all bugs in the game (probably slow).
+  function selectObject() { // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
     const bugsAndEntity = bugsList.concat(entityList); // combine bugs and entity arrays
     for (const obj of bugsAndEntity) {
       if (canvasMousePos.x >= obj.bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
@@ -140,12 +139,10 @@ window.addEventListener('load', () => {
     UpdateStatDisplays();
   }
   function checkBugDeath(bugObj) {
-    if (bugObj.food < 0) {
+    if (bugObj.food <= 0) {
       bugDeath(bugObj, 'food');
-    } else if (bugObj.sleep < 0) {
-      bugDeath(bugObj, 'sleep');
-    } else if (bugObj.cleanliness < 0) {
-      bugDeath(bugObj, 'cleanliness');
+    } else if (bugObj.cleanliness <= 0) {
+      bugDeath(bugObj, 'hygine');
     }
   }
   function bugDeath(bugObj, cause) {
@@ -168,6 +165,7 @@ window.addEventListener('load', () => {
       UpdateStatDisplays();
     }
   }
+
   function harvestSelecting() {
     if (currentObj.behaviour !== 'harvesting') {
       toggleHarvestSelecting = true;
@@ -178,7 +176,6 @@ window.addEventListener('load', () => {
     }
   }
   function harvestLogic() {
-    document.querySelector('#harvestBugName').textContent = currentObj.name;
     if (selectedForHarvest[0] instanceof FoodEntity) {
       // works
       document.querySelector('#foodSourceName').textContent = selectedForHarvest[0].name;
@@ -203,6 +200,23 @@ window.addEventListener('load', () => {
     }
   }
 
+  function findClosestDen() {
+    let closestDenValue = null;
+    let closestDenObj;
+    for (const building of entityList) { // Loop through array containing all buildings
+      if (building instanceof SleepingDenBuilding) { // check if the building is a Den
+        const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
+        console.log(distanceFromDen);
+        if (closestDenValue === null || distanceFromDen < closestDenValue) {
+          closestDenValue = distanceFromDen;
+          closestDenObj = building;
+          console.log(closestDenObj);
+        }
+      }
+    }
+    currentObj.setBehaviour('moveToDen', closestDenObj);
+  }
+
   function createNewEntity(newEntityType) {
     if (newEntityType === 'food') {
       entityList.push(new FoodEntity(1000, 1000));
@@ -211,6 +225,8 @@ window.addEventListener('load', () => {
   function createNewBuilding(newBuildingType) {
     if (newBuildingType === 'food_storage') {
       entityList.push(new FoodStorageBuilding(1500, 1000));
+    } else if (newBuildingType === 'sleeping_den') {
+      entityList.push(new SleepingDenBuilding(100, 100));
     }
   }
 
@@ -228,6 +244,7 @@ window.addEventListener('load', () => {
 
     if (toggleHarvestSelecting) {
       document.querySelector('#harvestingElems').style.display = 'block';
+      document.querySelector('#harvestBugName').textContent = currentObj.name;
       return;
     }
 
@@ -268,9 +285,15 @@ window.addEventListener('load', () => {
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
     for (const bug of bugsList) {
       bug.reduceFood();
-      bug.reduceSleep();
-      bug.reduceCleanliness();
-      bug.calculateHappiness();
+      if (bug.sleep <= 0 || bug.behaviour === 'sleeping') {
+        bug.setBehaviour('sleeping');
+        bug.increaseSleep(5);
+      } else {
+        bug.reduceSleep();
+        bug.reduceCleanliness();
+        bug.calculateHappiness();
+      }
+
 
       checkBugDeath(bug);
     }
@@ -282,11 +305,11 @@ window.addEventListener('load', () => {
 
   function addListeners() { // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
     const feedButton = document.querySelector('#plusFood');
-    feedButton.addEventListener('click', () => currentObj.increaseFood());
+    feedButton.addEventListener('click', () => currentObj.increaseFood(2));
     const cleanButton = document.querySelector('#plusClean');
-    cleanButton.addEventListener('click', () => currentObj.increaseCleanliness());
+    cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
     const sleepButton = document.querySelector('#plusSleep');
-    sleepButton.addEventListener('click', () => currentObj.increaseSleep());
+    sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
     const starveButton = document.querySelector('#subFood');
     starveButton.addEventListener('click', () => currentObj.reduceFood());
     const dirtyButton = document.querySelector('#subClean');
@@ -302,6 +325,9 @@ window.addEventListener('load', () => {
 
     const toggleHarvestButton = document.querySelector('#startHarvest');
     toggleHarvestButton.addEventListener('click', harvestSelecting);
+
+    const findDenButton = document.querySelector('#findDen');
+    findDenButton.addEventListener('click', () => findClosestDen());
 
     const canvas = document.getElementById('canvas1');
     canvas.addEventListener('click', selectObject);
