@@ -8,7 +8,7 @@ export class Bug {
     this.sleep = 50;
     this.cleanliness = 50;
     this.happiness = 50;
-    this.speed = 2;
+    // this.speed = 2;
 
     this.x = spawnX;
     this.y = spawnY;
@@ -35,6 +35,7 @@ export class Bug {
     this.foodInventory = 0;
 
     this.denTarget = null;
+    this.isInDen = false;
   }
 
   reduceFood() {
@@ -95,6 +96,15 @@ export class Bug {
     };
   }
 
+  calculateSpeed() {
+    if (this.sleep > 80) {
+      return 4;
+    } else if (this.sleep < 20) {
+      return 1;
+    } else {
+      return this.sleep / 20;
+    }
+  }
 
   moveLerp(overallSpeed) { // speed is amount per second
     if (this.moveDestination.x === this.x && this.moveDestination.y === this.y) { // If the bug is at its destination then break
@@ -105,6 +115,7 @@ export class Bug {
         this.depositFood(10);
       } else if (this.behaviour === 'moveToDen') {
         this.enterDen();
+        this.isInDen = true;
       }
       return;
     }
@@ -143,7 +154,7 @@ export class Bug {
     }
 
     if (this.movingState === 'moving') {
-      this.moveLerp(this.speed);
+      this.moveLerp(this.calculateSpeed());
     }
   }
 
@@ -173,9 +184,15 @@ export class Bug {
 
   sleepingBehaviour() {
     if (this.sleep >= 100) {
-      this.denTarget.removeTenant(this);
+      if (this.isInDen) {
+        this.denTarget.removeTenant(this);
+      } else {
+        this.setBehaviour('wandering');
+      }
+      document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
     } else {
       this.movingState = 'idle';
+      document.querySelector('#findDen').textContent = 'Press to wake up';
     }
   }
 

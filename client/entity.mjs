@@ -143,6 +143,7 @@ export class SleepingDenBuilding extends Entity {
     bugObj.x = this.x;
     bugObj.y = this.y; // teleport bug back to the den to look like they've left the den
     bugObj.setBehaviour('wandering');
+    bugObj.isInDen = false;
   }
 }
 

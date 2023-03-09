@@ -167,10 +167,10 @@ window.addEventListener('load', () => {
   }
 
   function harvestSelecting() {
-    if (currentObj.behaviour !== 'harvesting') {
+    if (currentObj.behaviour !== 'harvesting') { // start harvesting
       toggleHarvestSelecting = true;
       UpdateStatDisplays();
-    } else {
+    } else { // cancel harvesting
       currentObj.setBehaviour('wandering');
       document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
     }
@@ -201,20 +201,27 @@ window.addEventListener('load', () => {
   }
 
   function findClosestDen() {
-    let closestDenValue = null;
-    let closestDenObj;
-    for (const building of entityList) { // Loop through array containing all buildings
-      if (building instanceof SleepingDenBuilding) { // check if the building is a Den
-        const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
-        console.log(distanceFromDen);
-        if (closestDenValue === null || distanceFromDen < closestDenValue) {
-          closestDenValue = distanceFromDen;
-          closestDenObj = building;
-          console.log(closestDenObj);
+    if (currentObj.behaviour === 'sleeping') { // if already sleeping, then wake up
+      currentObj.setBehaviour('wandering');
+      document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
+      currentObj.denTarget.removeTenant(currentObj);
+    } else {
+      let closestDenValue = null;
+      let closestDenObj;
+      for (const building of entityList) { // Loop through array containing all buildings
+        if (building instanceof SleepingDenBuilding) { // check if the building is a Den
+          const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
+          console.log(distanceFromDen);
+          if (closestDenValue === null || distanceFromDen < closestDenValue) {
+            closestDenValue = distanceFromDen;
+            closestDenObj = building;
+            console.log(closestDenObj);
+          }
         }
       }
+      currentObj.setBehaviour('moveToDen', closestDenObj);
+      document.querySelector('#findDen').textContent = 'Press to wake up';
     }
-    currentObj.setBehaviour('moveToDen', closestDenObj);
   }
 
   function createNewEntity(newEntityType) {
@@ -266,6 +273,12 @@ window.addEventListener('load', () => {
         document.querySelector('#startHarvest').textContent = 'Press to cancel harvesting';
       } else {
         document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
+      }
+
+      if (currentObj.behaviour === 'sleeping') {
+        document.querySelector('#findDen').textContent = 'Press to wake up';
+      } else {
+        document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
       }
 
       if (currentObj instanceof Queen) {
