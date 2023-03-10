@@ -78,9 +78,11 @@ window.addEventListener('load', () => {
   console.log(entityList);
 
   createNewEntity('food');
-  createNewBuilding('food_storage');
+  createNewBuilding('food_storage', 1000, 400);
 
-  createNewBuilding('sleeping_den');
+  createNewBuilding('sleeping_den', 100, 100);
+  createNewBuilding('sleeping_den', 300, 300);
+
 
   addListeners();
   updateFrame();
@@ -100,9 +102,13 @@ window.addEventListener('load', () => {
           selectedForHarvest.push(obj);
           harvestLogic();
         } else { // if selecting is in normal mode,
-          currentObj = obj;
-          UpdateStatDisplays();
-          return;
+          if (currentObj === obj) { // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
+            // skip this round of the loop
+          } else {
+            currentObj = obj;
+            UpdateStatDisplays();
+            return;
+          }
         }
       } else {
         console.log("No bug 'ere");
@@ -245,11 +251,11 @@ window.addEventListener('load', () => {
       entityList.push(new FoodEntity(1000, 1000));
     }
   }
-  function createNewBuilding(newBuildingType) {
+  function createNewBuilding(newBuildingType, spawnX, spawnY) {
     if (newBuildingType === 'food_storage') {
-      entityList.push(new FoodStorageBuilding(1500, 1000));
+      entityList.push(new FoodStorageBuilding(spawnX, spawnY));
     } else if (newBuildingType === 'sleeping_den') {
-      entityList.push(new SleepingDenBuilding(100, 100));
+      entityList.push(new SleepingDenBuilding(spawnX, spawnY));
     }
   }
 
