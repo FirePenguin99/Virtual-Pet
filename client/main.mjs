@@ -66,6 +66,13 @@ window.addEventListener('load', () => {
   const selectEntity = new SelectionEntity();
 
   createNewBug('goob', 'queen');
+  createNewBug('dude', 'worker');
+  createNewBug('the dude', 'worker');
+  createNewBug('dudest', 'worker');
+  createNewBug('duderino', 'worker');
+  createNewBug('the dudester', 'worker');
+  createNewBug('dudeman', 'worker');
+
 
   createNewEntity('selection');
   console.log(entityList);
@@ -204,12 +211,16 @@ window.addEventListener('load', () => {
     if (currentObj.behaviour === 'sleeping') { // if already sleeping, then wake up
       currentObj.setBehaviour('wandering');
       document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
-      currentObj.denTarget.removeTenant(currentObj);
-    } else {
+      if (currentObj.isInDen) {
+        currentObj.denTarget.removeTenant(currentObj);
+      } else {
+        currentObj.setBehaviour('wandering');
+      }
+    } else { // find closest den and set behaviour to moveToDen
       let closestDenValue = null;
-      let closestDenObj;
+      let closestDenObj = null;
       for (const building of entityList) { // Loop through array containing all buildings
-        if (building instanceof SleepingDenBuilding) { // check if the building is a Den
+        if (building instanceof SleepingDenBuilding && building.occupancy !== building.maxOccupancy) { // check if the building is a Den and that it is not full
           const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
           console.log(distanceFromDen);
           if (closestDenValue === null || distanceFromDen < closestDenValue) {
@@ -219,8 +230,13 @@ window.addEventListener('load', () => {
           }
         }
       }
-      currentObj.setBehaviour('moveToDen', closestDenObj);
-      document.querySelector('#findDen').textContent = 'Press to wake up';
+
+      if (closestDenObj === null) {
+        console.log('no dens found');
+      } else {
+        currentObj.setBehaviour('moveToDen', closestDenObj);
+        document.querySelector('#findDen').textContent = 'Press to wake up';
+      }
     }
   }
 
@@ -275,11 +291,11 @@ window.addEventListener('load', () => {
         document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
       }
 
-      if (currentObj.behaviour === 'sleeping') {
-        document.querySelector('#findDen').textContent = 'Press to wake up';
-      } else {
-        document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
-      }
+      // if (currentObj.behaviour === 'sleeping') {
+      //   document.querySelector('#findDen').textContent = 'Press to wake up';
+      // } else {
+      //   // document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
+      // }
 
       if (currentObj instanceof Queen) {
         document.querySelector('#newBug').style.display = 'block';
@@ -297,11 +313,15 @@ window.addEventListener('load', () => {
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
     for (const bug of bugsList) {
-      bug.reduceFood();
       if (bug.sleep <= 0 || bug.behaviour === 'sleeping') {
         bug.setBehaviour('sleeping');
-        bug.increaseSleep(5);
+        if (bug.isInDen) {
+          bug.increaseSleep(10);
+        } else {
+          bug.increaseSleep(5);
+        }
       } else {
+        bug.reduceFood();
         bug.reduceSleep();
         bug.reduceCleanliness();
         bug.calculateHappiness();
