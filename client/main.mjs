@@ -228,11 +228,11 @@ window.addEventListener('load', () => {
       for (const building of entityList) { // Loop through array containing all buildings
         if (building instanceof SleepingDenBuilding && building.occupancy !== building.maxOccupancy) { // check if the building is a Den and that it is not full
           const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
-          console.log(distanceFromDen);
+          // console.log(distanceFromDen);
           if (closestDenValue === null || distanceFromDen < closestDenValue) {
             closestDenValue = distanceFromDen;
             closestDenObj = building;
-            console.log(closestDenObj);
+            // console.log(closestDenObj);
           }
         }
       }
@@ -241,7 +241,6 @@ window.addEventListener('load', () => {
         console.log('no dens found');
       } else {
         currentObj.setBehaviour('moveToDen', closestDenObj);
-        document.querySelector('#findDen').textContent = 'Press to wake up';
       }
     }
   }
@@ -297,11 +296,11 @@ window.addEventListener('load', () => {
         document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
       }
 
-      // if (currentObj.behaviour === 'sleeping') {
-      //   document.querySelector('#findDen').textContent = 'Press to wake up';
-      // } else {
-      //   // document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
-      // }
+      if (currentObj.behaviour === 'sleeping') {
+        document.querySelector('#findDen').textContent = 'Press to wake up';
+      } else {
+        document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
+      }
 
       if (currentObj instanceof Queen) {
         document.querySelector('#newBug').style.display = 'block';
@@ -315,6 +314,17 @@ window.addEventListener('load', () => {
       document.querySelector('#deathdayDisplay').textContent = 'date of death: ' + currentObj.bugDeathday.getDate() + '/' + (currentObj.bugDeathday.getMonth() + 1) + '/' + currentObj.bugDeathday.getFullYear();
       document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugTimeAlive.hours + ':' + currentObj.bugTimeAlive.minutes + ':' + currentObj.bugTimeAlive.seconds;
       document.querySelector('#causeDisplay').textContent = 'cause of death: lack of ' + currentObj.causeOfDeath;
+    } else if (currentObj instanceof SleepingDenBuilding) {
+      document.querySelector('#denElems').style.display = 'block';
+      document.querySelector('#occupancy').textContent = 'occupancy: ' + currentObj.occupancy + '/' + currentObj.maxOccupancy;
+      for (const tenantButton of document.querySelector('#tenantButtons').children) { // loops through button elements and hides them all
+        tenantButton.style.display = 'none';
+      }
+      for (const tenant of currentObj.tenants) { // loops through tenants in the den, and displays and updates buttons depending on the amount of tenants.
+        const button = document.querySelector('#tenant_' + (currentObj.tenants.indexOf(tenant) + 1));
+        button.style.display = 'block';
+        button.textContent = tenant.name + "'s sleep: " + tenant.sleep + '/100' + '\n' + ' Press to wake up';
+      }
     }
   }
   function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
@@ -371,8 +381,20 @@ window.addEventListener('load', () => {
     const canvas = document.getElementById('canvas1');
     canvas.addEventListener('click', selectObject);
 
+    document.querySelector('#tenant_1').addEventListener('click', () => removeTenantButton(0));
+    document.querySelector('#tenant_2').addEventListener('click', () => removeTenantButton(1));
+    document.querySelector('#tenant_3').addEventListener('click', () => removeTenantButton(2));
+    document.querySelector('#tenant_4').addEventListener('click', () => removeTenantButton(3));
+    document.querySelector('#tenant_5').addEventListener('click', () => removeTenantButton(4));
+
     canvas.addEventListener('mousemove', (e) => calculateMousePos(e)); // Doubt this'll work as intended. Will need somekind of setTimeout or running in the updateAll function. If so, then may not be possible to use event listeners.
     canvas.addEventListener('mouseup', toggleHold);
     canvas.addEventListener('mousedown', toggleHold);
+  }
+
+  function removeTenantButton(i) {
+    console.log(currentObj.tenants[i]);
+    currentObj.removeTenant(currentObj.tenants[i]);
+    UpdateStatDisplays();
   }
 });

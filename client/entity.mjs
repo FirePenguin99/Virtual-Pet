@@ -136,7 +136,6 @@ export class SleepingDenBuilding extends Entity {
   }
 
   removeTenant(bugObj) {
-    this.tenants.push(bugObj);
     const tenantIndex = this.tenants.indexOf(bugObj);
     this.tenants.splice(tenantIndex, 1);
     this.occupancy -= 1;

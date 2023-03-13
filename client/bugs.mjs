@@ -189,10 +189,8 @@ export class Bug {
       } else {
         this.setBehaviour('wandering');
       }
-      document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
     } else {
       this.movingState = 'idle';
-      document.querySelector('#findDen').textContent = 'Press to wake up';
     }
   }
 
