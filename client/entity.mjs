@@ -83,6 +83,11 @@ export class FoodStorageBuilding extends Entity {
       bottom: this.y + (this.height / 2),
     };
 
+    this.constructionProgress = { // building construction time in seconds
+      current: 0,
+      complete: 15,
+    };
+
     this.foodInventory = 0;
 
     this.name = 'food storage';
@@ -112,6 +117,11 @@ export class SleepingDenBuilding extends Entity {
       right: this.x + (this.width / 2),
       top: this.y - (this.height / 2),
       bottom: this.y + (this.height / 2),
+    };
+
+    this.constructionProgress = { // building construction time in seconds
+      current: 0,
+      complete: 10,
     };
 
     this.occupancy = 0;

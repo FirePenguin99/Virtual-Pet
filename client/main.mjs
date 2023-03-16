@@ -1,5 +1,6 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
-import { Entity, FoodEntity, FoodStorageBuilding, GravestoneEntity, SelectionEntity, SleepingDenBuilding } from './entity.mjs';
+import { Entity, FoodEntity, GravestoneEntity, SelectionEntity } from './entity.mjs';
+import { FoodStorageBuilding, SleepingDenBuilding } from './building.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -52,6 +53,8 @@ window.addEventListener('load', () => {
     for (const entity of entityList) { // Loop through array containing all Entities, and call their draw() method.
       entity.draw(ctx, visualOffset);
     }
+
+    entityList[1].construct(deltaTime / 1000);
 
     requestAnimationFrame(updateFrame); // call the function again
   }
