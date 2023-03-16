@@ -54,7 +54,8 @@ window.addEventListener('load', () => {
       entity.draw(ctx, visualOffset);
     }
 
-    entityList[1].construct(deltaTime / 1000);
+    // entityList[1].construct(deltaTime / 1000);
+    console.log(bugsList[1].behaviour);
 
     requestAnimationFrame(updateFrame); // call the function again
   }
@@ -76,7 +77,6 @@ window.addEventListener('load', () => {
   createNewBug('the dudester', 'worker');
   createNewBug('dudeman', 'worker');
 
-
   createNewEntity('selection');
   console.log(entityList);
 
@@ -86,6 +86,9 @@ window.addEventListener('load', () => {
   createNewBuilding('sleeping_den', 100, 100);
   createNewBuilding('sleeping_den', 300, 300);
 
+  bugsList[1].setBehaviour('building', entityList[1]);
+  console.log(bugsList[1].behaviour);
+  currentObj = bugsList[1];
 
   addListeners();
   updateFrame();

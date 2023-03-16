@@ -36,6 +36,10 @@ export class Bug {
 
     this.denTarget = null;
     this.isInDen = false;
+
+    this.buildingTarget = null;
+
+    this.entityTarget = null;
   }
 
   reduceFood() {
@@ -109,6 +113,7 @@ export class Bug {
   moveLerp(overallSpeed) { // speed is amount per second
     if (this.moveDestination.x === this.x && this.moveDestination.y === this.y) { // If the bug is at its destination then break
       this.movingState = 'idle';
+
       if (this.behaviour === 'harvesting') {
         this.withdrawFood(10);
       } else if (this.behaviour === 'storing') {
@@ -116,6 +121,8 @@ export class Bug {
       } else if (this.behaviour === 'moveToDen') {
         this.enterDen();
         this.isInDen = true;
+      } else if (this.behaviour === 'moveToBuilding') {
+        this.behaviour = 'building';
       }
       return;
     }
@@ -150,7 +157,11 @@ export class Bug {
     } else if (this.behaviour === 'sleeping') {
       this.sleepingBehaviour(deltaTime);
     } else if (this.behaviour === 'moveToDen') {
-      this.moveToDenBehaviour();
+      this.moveToBehaviour(this.entityTarget);
+    } else if (this.behaviour === 'moveToBuilding') {
+      this.moveToBehaviour(this.entityTarget);
+    } else if (this.behaviour === 'building') {
+      this.startBuilding(deltaTime);
     }
 
     if (this.movingState === 'moving') {
@@ -185,7 +196,7 @@ export class Bug {
   sleepingBehaviour() {
     if (this.sleep >= 100) {
       if (this.isInDen) {
-        this.denTarget.removeTenant(this);
+        this.entityTarget.removeTenant(this);
       } else {
         this.setBehaviour('wandering');
       }
@@ -194,14 +205,34 @@ export class Bug {
     }
   }
 
-  moveToDenBehaviour() {
-    this.moveDestination.x = this.denTarget.x;
-    this.moveDestination.y = this.denTarget.y;
+  moveToBehaviour(target) {
+    this.moveDestination.x = target.x;
+    this.moveDestination.y = target.y;
     this.movingState = 'moving';
   }
 
   enterDen() {
-    this.denTarget.addTenant(this);
+    this.entityTarget.addTenant(this);
+  }
+
+  startBuilding(deltaTime) {
+    if (!this.entityTarget.underConstruction) {
+      this.behaviour = 'wandering';
+      this.entityTarget = null;
+      return;
+    }
+    if (this.wanderTimer > this.wanderInterval) { // If the wander timer is up, and the bug is ready to begin wandering:
+      this.wanderTimer = 0;
+
+      this.moveDestination = { x: ((Math.random() * this.entityTarget.width - (this.entityTarget.width / 2) + this.entityTarget.x)), y: ((Math.random() * this.entityTarget.height - (this.entityTarget.height / 2) + this.entityTarget.y)) };
+
+      this.movingState = 'moving'; // We get him moving. Don't call moveLerp here, as this section only occurs once every time the wander timer has ran out, therefore won't activate every frame.
+
+      this.wanderInterval = (Math.random() * 3000);
+    }
+    this.wanderTimer += deltaTime;
+
+    this.entityTarget.construct(deltaTime / 1000);
   }
 
   setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
@@ -220,7 +251,10 @@ export class Bug {
       this.behaviour = 'sleeping';
     } else if (arguments[0] === 'moveToDen') {
       this.behaviour = 'moveToDen';
-      this.denTarget = arguments[1];
+      this.entityTarget = arguments[1];
+    } else if (arguments[0] === 'building') {
+      this.behaviour = 'moveToBuilding';
+      this.entityTarget = arguments[1];
     }
   }
 

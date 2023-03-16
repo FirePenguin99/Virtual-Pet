@@ -25,11 +25,10 @@ export class Building extends Entity {
 
   construct(amount) {
     this.constructionProgress.current += amount;
-    // console.log(this.constructionProgress.current);
     if (this.constructionProgress.current > this.constructionProgress.complete) {
       this.underConstruction = false;
     } else if (this.underConstruction && this.constructionProgress.current > (this.constructionProgress.complete / this.imageStages.length) * this.stage + 1) {
-      console.log('bruh: ' + this.stage);
+      console.log('stage: ' + this.stage);
       this.image = this.imageStages[this.stage];
       this.stage += 1;
     }
@@ -54,19 +53,16 @@ export class FoodStorageBuilding extends Building {
 
     this.constructionProgress.complete = 15; // building completion time in seconds
 
-    this.imageStages[0] = (document.querySelector('#food_storage_stage_0_sprite'));
-    this.imageStages[1] = (document.querySelector('#food_storage_stage_1_sprite'));
-    this.imageStages[2] = (document.querySelector('#food_storage_stage_2_sprite'));
-    this.imageStages[3] = (document.querySelector('#food_storage_sprite'));
-
-    console.log(this.imageStages.length);
-    console.log(this.stage + ' ' + this.constructionProgress.current);
+    this.imageStages[0] = document.querySelector('#food_storage_stage_0_sprite');
+    this.imageStages[1] = document.querySelector('#food_storage_stage_1_sprite');
+    this.imageStages[2] = document.querySelector('#food_storage_stage_2_sprite');
+    this.imageStages[3] = document.querySelector('#food_storage_sprite');
 
 
     this.foodInventory = 0;
 
     this.name = 'food storage';
-    this.image = document.querySelector('#food_storage_sprite');
+    this.image = this.imageStages[0];
   }
 
   increaseFood(amount) {
