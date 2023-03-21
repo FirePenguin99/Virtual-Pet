@@ -194,13 +194,13 @@ export class Bug {
   }
 
   sleepingBehaviour() {
-    if (this.sleep >= 100) {
-      if (this.isInDen) {
+    if (this.sleep >= 100) { // if finished sleeping
+      if (this.isInDen) { // if its in a den,
         this.entityTarget.removeTenant(this);
-      } else {
+      } else { // if its sleeping on the floor,
         this.setBehaviour('wandering');
       }
-    } else {
+    } else { // if sleeping,
       this.movingState = 'idle';
     }
   }

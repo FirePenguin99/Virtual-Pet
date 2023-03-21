@@ -1,5 +1,5 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
-import { Entity, FoodEntity, GravestoneEntity, SelectionEntity } from './entity.mjs';
+import { Entity, FoodEntity, GravestoneEntity, SelectionEntity, TemplateBuildingEntity } from './entity.mjs';
 import { FoodStorageBuilding, SleepingDenBuilding } from './building.mjs';
 
 window.addEventListener('load', () => {
@@ -9,13 +9,19 @@ window.addEventListener('load', () => {
 
   const mapImage = document.querySelector('#map');
 
+  // variables for setting bug's behaviour to harvest
   let toggleHarvestSelecting = false;
   const selectedForHarvest = [];
+
+  // variables for building placement and creation
+  let newBuildingTemplate = null;
+  let isPlacingBuilding = false;
+  let isTemplateSelected = false;
 
   // Variables for mouse movement and map movement
   let mouseHold = false;
   let canvasMousePos = { x: null, y: null };
-  const visualOffset = { x: null, y: null };
+  const visualOffset = { x: 0, y: 0 };
   let oldPos = null;
 
   let previousTimeStamp = 0; // initialising previousTimeStamp for use in updateFrame()
@@ -32,8 +38,16 @@ window.addEventListener('load', () => {
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-    if (mouseHold) {
-      moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
+    if (mouseHold) { // if holding down mouse
+      if (isPlacingBuilding) { // if currently trying to place building
+        if (isTemplateSelected) {
+          newBuildingTemplate.moveToCursor(canvasMousePos, visualOffset); // move it to the mouse position
+        } else {
+          moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
+        }
+      } else {
+        moveMap(); // two instances of moveMap since this one gets disabled if isPlacingBuilding is true, which is not correct, map should not move when moving the template
+      }
     }
 
     // ---- For clearing and redrawing the objects in the scene, as well as bug behaviour  ----
@@ -54,8 +68,12 @@ window.addEventListener('load', () => {
       entity.draw(ctx, visualOffset);
     }
 
-    // entityList[1].construct(deltaTime / 1000);
-    console.log(bugsList[1].behaviour);
+    if (isPlacingBuilding) {
+      newBuildingTemplate.checkCollisions(entityList);
+      newBuildingTemplate.draw(ctx, visualOffset);
+      // console.log(newBuildingTemplate.x + ': ' + newBuildingTemplate.y + ': ' + visualOffset.x + ',' + visualOffset.y);
+    }
+    // console.log(visualOffset);
 
     requestAnimationFrame(updateFrame); // call the function again
   }
@@ -83,12 +101,15 @@ window.addEventListener('load', () => {
   createNewEntity('food');
   createNewBuilding('food_storage', 1000, 400);
 
+  createNewBuilding('sleeping_den', 0, 0);
+
   createNewBuilding('sleeping_den', 100, 100);
   createNewBuilding('sleeping_den', 300, 300);
 
-  bugsList[1].setBehaviour('building', entityList[1]);
-  console.log(bugsList[1].behaviour);
-  currentObj = bugsList[1];
+  // bugsList[1].setBehaviour('building', entityList[1]);
+
+  // console.log(bugsList[1].behaviour);
+  // currentObj = bugsList[1];
 
   addListeners();
   updateFrame();
@@ -96,6 +117,18 @@ window.addEventListener('load', () => {
 
 
   function selectObject() { // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
+    if (isPlacingBuilding) { // if the user is trying to place a new building,
+      if (canvasMousePos.x >= newBuildingTemplate.bounds.left + visualOffset.x && // if mouse is within the bounds of the building template
+        canvasMousePos.x <= newBuildingTemplate.bounds.right + visualOffset.x &&
+        canvasMousePos.y >= newBuildingTemplate.bounds.top + visualOffset.y &&
+        canvasMousePos.y <= newBuildingTemplate.bounds.bottom + visualOffset.y) {
+        isTemplateSelected = true;
+      } else { // if cursor not in bounds
+        isTemplateSelected = false;
+      }
+      return;
+    }
+
     const bugsAndEntity = bugsList.concat(entityList); // combine bugs and entity arrays
     for (const obj of bugsAndEntity) {
       if (canvasMousePos.x >= obj.bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
@@ -122,9 +155,16 @@ window.addEventListener('load', () => {
     }
   }
 
-  function toggleHold() { // Called by event listeners on mouse down and mouse up. Toggles a bool variable which represents the mouse's state
-    mouseHold = !mouseHold;
+  function mouseDown() { // Called by event listeners on mouse down and mouse up. Toggles a bool variable which represents the mouse's state
+    mouseHold = true;
     oldPos = null;
+
+    selectObject();
+  }
+  function mouseUp() {
+    mouseHold = false;
+    oldPos = null;
+    isTemplateSelected = false;
   }
   function calculateMousePos(event) { // Is run every time the mouse moves, and writes to a global variable.
     const bounds = canvas.getBoundingClientRect();
@@ -264,12 +304,22 @@ window.addEventListener('load', () => {
     }
   }
 
+  function placeNewBuilding(newBuildingType) {
+    if (newBuildingType === 'den') {
+      newBuildingTemplate = (new TemplateBuildingEntity('denTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 100, document.querySelector('#sleeping_den_sprite')));
+      isPlacingBuilding = true;
+    } else if (newBuildingType === 'storage') {
+      newBuildingTemplate = (new TemplateBuildingEntity('storageTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, document.querySelector('#food_storage_sprite')));
+      isPlacingBuilding = true;
+    }
+  }
+
 
   function UpdateStatDisplays() {
     // update all the attribute displays to represent the selected pet
     const childOfDiv = document.querySelector('#UI').children; // Hide all child elements of the UI div
     for (let index = 0; index < childOfDiv.length; index++) {
-      childOfDiv[index].style.display = 'none';
+      childOfDiv[index].classList.add('hidden');
     }
 
     if (currentObj === null) {
@@ -277,19 +327,19 @@ window.addEventListener('load', () => {
     }
 
     if (toggleHarvestSelecting) {
-      document.querySelector('#harvestingElems').style.display = 'block';
+      document.querySelector('#harvestingElems').classList.remove('hidden');
       document.querySelector('#harvestBugName').textContent = currentObj.name;
       return;
     }
 
-    document.querySelector('#nameDisplay').style.display = 'block';
+    document.querySelector('#nameDisplay').classList.remove('hidden');
     document.querySelector('#nameDisplay').textContent = 'name: ' + currentObj.name;
 
     if (currentObj instanceof Bug) { // Show and update only the relevent child elements
-      document.querySelector('#bugButtons').style.display = 'block';
+      document.querySelector('#bugButtons').classList.remove('hidden');
 
-      document.querySelector('#foodDisplay').style.display = 'block';
-      document.querySelector('#bugStats').style.display = 'block';
+      document.querySelector('#foodDisplay').classList.remove('hidden');
+      document.querySelector('#bugStats').classList.remove('hidden');
 
       document.querySelector('#foodDisplay').textContent = 'food: ' + currentObj.food;
       document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
@@ -309,26 +359,26 @@ window.addEventListener('load', () => {
       }
 
       if (currentObj instanceof Queen) {
-        document.querySelector('#newBug').style.display = 'block';
+        document.querySelector('#newBug').classList.remove('hidden');
       }
     } else if (currentObj instanceof FoodEntity || currentObj instanceof FoodStorageBuilding) {
-      document.querySelector('#foodDisplay').style.display = 'block';
+      document.querySelector('#foodDisplay').classList.remove('hidden');
       document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
     } else if (currentObj instanceof GravestoneEntity) {
-      document.querySelector('#graveElems').style.display = 'block';
+      document.querySelector('#graveElems').classList.remove('hidden');
       document.querySelector('#birthdayDisplay').textContent = 'date of birth: ' + currentObj.bugBirthday.getDate() + '/' + (currentObj.bugBirthday.getMonth() + 1) + '/' + currentObj.bugBirthday.getFullYear();
       document.querySelector('#deathdayDisplay').textContent = 'date of death: ' + currentObj.bugDeathday.getDate() + '/' + (currentObj.bugDeathday.getMonth() + 1) + '/' + currentObj.bugDeathday.getFullYear();
       document.querySelector('#timeAliveDisplay').textContent = 'time survived: ' + currentObj.bugTimeAlive.hours + ':' + currentObj.bugTimeAlive.minutes + ':' + currentObj.bugTimeAlive.seconds;
       document.querySelector('#causeDisplay').textContent = 'cause of death: lack of ' + currentObj.causeOfDeath;
     } else if (currentObj instanceof SleepingDenBuilding) {
-      document.querySelector('#denElems').style.display = 'block';
+      document.querySelector('#denElems').classList.remove('hidden');
       document.querySelector('#occupancy').textContent = 'occupancy: ' + currentObj.occupancy + '/' + currentObj.maxOccupancy;
       for (const tenantButton of document.querySelector('#tenantButtons').children) { // loops through button elements and hides them all
         tenantButton.style.display = 'none';
       }
       for (const tenant of currentObj.tenants) { // loops through tenants in the den, and displays and updates buttons depending on the amount of tenants.
         const button = document.querySelector('#tenant_' + (currentObj.tenants.indexOf(tenant) + 1));
-        button.style.display = 'block';
+        button.classList.remove('hidden');
         button.textContent = tenant.name + "'s sleep: " + tenant.sleep + '/100' + '\n' + ' Press to wake up';
       }
     }
@@ -385,7 +435,6 @@ window.addEventListener('load', () => {
     findDenButton.addEventListener('click', () => findClosestDen());
 
     const canvas = document.getElementById('canvas1');
-    canvas.addEventListener('click', selectObject);
 
     document.querySelector('#tenant_1').addEventListener('click', () => removeTenantButton(0));
     document.querySelector('#tenant_2').addEventListener('click', () => removeTenantButton(1));
@@ -393,9 +442,12 @@ window.addEventListener('load', () => {
     document.querySelector('#tenant_4').addEventListener('click', () => removeTenantButton(3));
     document.querySelector('#tenant_5').addEventListener('click', () => removeTenantButton(4));
 
+    document.querySelector('#buildADen').addEventListener('click', () => placeNewBuilding('den'));
+    document.querySelector('#buildAStorage').addEventListener('click', () => placeNewBuilding('storage'));
+
     canvas.addEventListener('mousemove', (e) => calculateMousePos(e)); // Doubt this'll work as intended. Will need somekind of setTimeout or running in the updateAll function. If so, then may not be possible to use event listeners.
-    canvas.addEventListener('mouseup', toggleHold);
-    canvas.addEventListener('mousedown', toggleHold);
+    canvas.addEventListener('mouseup', mouseUp);
+    canvas.addEventListener('mousedown', mouseDown);
   }
 
   function removeTenantButton(i) {

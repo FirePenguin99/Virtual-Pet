@@ -121,3 +121,80 @@ export class SelectionEntity extends Entity {
     this.draw(context, offset);
   }
 }
+
+export class TemplateBuildingEntity extends Entity {
+  constructor(name, spawnX, spawnY, width, height, image) {
+    super(name, spawnX, spawnY, width, height, image);
+    this.canPlace = true;
+  }
+
+  draw(context, offset) {
+    if (this.canPlace) {
+      context.globalAlpha = 0.5;
+      context.fillStyle = '#00FF00'; // green highlight to the image
+      context.fillRect(this.bounds.left + offset.x, this.bounds.top + offset.y, this.width, this.height);
+    } else {
+      context.globalAlpha = 0.5;
+      context.fillStyle = '#FF0000'; // red highlight to the image
+      context.fillRect(this.bounds.left + offset.x, this.bounds.top + offset.y, this.width, this.height);
+    }
+    context.drawImage(this.image, this.x + offset.x - (this.width / 2), this.y + offset.y - (this.height / 2), this.width, this.height); // Adds actual position with visual offset from moving the camera/map. Subtracting the half height and width makes the x and y coords of the bug represent it's center, rather than top left edge.
+  }
+
+  moveToCursor(cursorCoords, offset) {
+    this.x = cursorCoords.x - offset.x;
+    this.y = cursorCoords.y - offset.y;
+    this.recalculateBounds();
+  }
+
+  checkCollisions(entityList) {
+    for (const entity of entityList) {
+      if (this.bounds.left >= entity.bounds.left && // top left
+      this.bounds.left <= entity.bounds.right &&
+      this.bounds.top >= entity.bounds.top &&
+      this.bounds.top <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else if (this.bounds.right >= entity.bounds.left && // top right
+      this.bounds.right <= entity.bounds.right &&
+      this.bounds.top >= entity.bounds.top &&
+      this.bounds.top <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else if (this.bounds.left >= entity.bounds.left && // bottom left
+      this.bounds.left <= entity.bounds.right &&
+      this.bounds.bottom >= entity.bounds.top &&
+      this.bounds.bottom <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else if (this.bounds.right >= entity.bounds.left && // bottom right
+      this.bounds.right <= entity.bounds.right &&
+      this.bounds.bottom >= entity.bounds.top &&
+      this.bounds.bottom <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else if (this.x >= entity.bounds.left && // middle
+      this.x <= entity.bounds.right &&
+      this.y >= entity.bounds.top &&
+      this.y <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else if (this.bounds.left >= entity.bounds.left && // middle of left edge (some buildings were too tall and missing all the other corners)
+      this.bounds.left <= entity.bounds.right &&
+      this.bounds.top + (this.height / 2) >= entity.bounds.top &&
+      this.bounds.top + (this.height / 2) <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else if (this.bounds.right >= entity.bounds.left && // middle of right edge (some buildings were too tall and missing all the other corners)
+      this.bounds.right <= entity.bounds.right &&
+      this.bounds.top + (this.height / 2) >= entity.bounds.top &&
+      this.bounds.top + (this.height / 2) <= entity.bounds.bottom) {
+        this.canPlace = false;
+        return;
+      } else {
+        this.canPlace = true;
+      }
+      // console.log(this.canPlace);
+    }
+  }
+}
