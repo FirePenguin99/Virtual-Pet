@@ -326,6 +326,11 @@ window.addEventListener('load', () => {
       console.log('no can do pal');
     }
   }
+  function cancelPlacement() {
+    buildingTemplate = null;
+    document.querySelector('#wishMeFuckingLuck').style.display = 'none';
+    isPlacingBuilding = false;
+  }
 
 
   function UpdateStatDisplays() {
@@ -463,7 +468,7 @@ window.addEventListener('load', () => {
     canvas.addEventListener('mousedown', mouseDown);
 
     document.querySelector('#accept').addEventListener('click', acceptPlacement);
-    // document.querySelector('#cancel').addEventListener('click', () => );
+    document.querySelector('#cancel').addEventListener('click', cancelPlacement);
   }
 
   function removeTenantButton(i) {
