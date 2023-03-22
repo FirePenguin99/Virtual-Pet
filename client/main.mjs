@@ -14,7 +14,7 @@ window.addEventListener('load', () => {
   const selectedForHarvest = [];
 
   // variables for building placement and creation
-  let newBuildingTemplate = null;
+  let buildingTemplate = null;
   let isPlacingBuilding = false;
   let isTemplateSelected = false;
 
@@ -41,7 +41,7 @@ window.addEventListener('load', () => {
     if (mouseHold) { // if holding down mouse
       if (isPlacingBuilding) { // if currently trying to place building
         if (isTemplateSelected) {
-          newBuildingTemplate.moveToCursor(canvasMousePos, visualOffset); // move it to the mouse position
+          buildingTemplate.moveToCursor(canvasMousePos, visualOffset); // move it to the mouse position
         } else {
           moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
         }
@@ -69,9 +69,9 @@ window.addEventListener('load', () => {
     }
 
     if (isPlacingBuilding) {
-      newBuildingTemplate.checkCollisions(entityList);
-      newBuildingTemplate.draw(ctx, visualOffset);
-      // console.log(newBuildingTemplate.x + ': ' + newBuildingTemplate.y + ': ' + visualOffset.x + ',' + visualOffset.y);
+      buildingTemplate.checkCollisions(entityList);
+      buildingTemplate.draw(ctx, visualOffset);
+      // console.log(buildingTemplate.x + ': ' + buildingTemplate.y + ': ' + visualOffset.x + ',' + visualOffset.y);
     }
     // console.log(visualOffset);
 
@@ -118,10 +118,10 @@ window.addEventListener('load', () => {
 
   function selectObject() { // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
     if (isPlacingBuilding) { // if the user is trying to place a new building,
-      if (canvasMousePos.x >= newBuildingTemplate.bounds.left + visualOffset.x && // if mouse is within the bounds of the building template
-        canvasMousePos.x <= newBuildingTemplate.bounds.right + visualOffset.x &&
-        canvasMousePos.y >= newBuildingTemplate.bounds.top + visualOffset.y &&
-        canvasMousePos.y <= newBuildingTemplate.bounds.bottom + visualOffset.y) {
+      if (canvasMousePos.x >= buildingTemplate.bounds.left + visualOffset.x && // if mouse is within the bounds of the building template
+        canvasMousePos.x <= buildingTemplate.bounds.right + visualOffset.x &&
+        canvasMousePos.y >= buildingTemplate.bounds.top + visualOffset.y &&
+        canvasMousePos.y <= buildingTemplate.bounds.bottom + visualOffset.y) {
         isTemplateSelected = true;
       } else { // if cursor not in bounds
         isTemplateSelected = false;
@@ -306,11 +306,24 @@ window.addEventListener('load', () => {
 
   function placeNewBuilding(newBuildingType) {
     if (newBuildingType === 'den') {
-      newBuildingTemplate = (new TemplateBuildingEntity('denTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 100, document.querySelector('#sleeping_den_sprite')));
+      buildingTemplate = (new TemplateBuildingEntity('denTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 100, document.querySelector('#sleeping_den_sprite')));
       isPlacingBuilding = true;
     } else if (newBuildingType === 'storage') {
-      newBuildingTemplate = (new TemplateBuildingEntity('storageTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, document.querySelector('#food_storage_sprite')));
+      buildingTemplate = (new TemplateBuildingEntity('storageTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, document.querySelector('#food_storage_sprite')));
       isPlacingBuilding = true;
+    }
+  }
+  function acceptPlacement() {
+    if (buildingTemplate.canPlace) {
+      if (buildingTemplate.name === 'denTemplate') {
+        entityList.push(new SleepingDenBuilding(buildingTemplate.x, buildingTemplate.y));
+      } else if (buildingTemplate.name === 'storageTemplate') {
+        entityList.push(new FoodStorageBuilding(buildingTemplate.x, buildingTemplate.y));
+      }
+      document.querySelector('#wishMeFuckingLuck').style.display = 'none';
+      isPlacingBuilding = false;
+    } else {
+      console.log('no can do pal');
     }
   }
 
@@ -448,6 +461,9 @@ window.addEventListener('load', () => {
     canvas.addEventListener('mousemove', (e) => calculateMousePos(e)); // Doubt this'll work as intended. Will need somekind of setTimeout or running in the updateAll function. If so, then may not be possible to use event listeners.
     canvas.addEventListener('mouseup', mouseUp);
     canvas.addEventListener('mousedown', mouseDown);
+
+    document.querySelector('#accept').addEventListener('click', acceptPlacement);
+    // document.querySelector('#cancel').addEventListener('click', () => );
   }
 
   function removeTenantButton(i) {
