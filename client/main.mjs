@@ -1,6 +1,6 @@
 import { Worker, Queen, Bug } from './bugs.mjs';
 import { Entity, FoodEntity, GravestoneEntity, SelectionEntity, TemplateBuildingEntity } from './entity.mjs';
-import { FoodStorageBuilding, SleepingDenBuilding } from './building.mjs';
+import { Building, FoodStorageBuilding, SleepingDenBuilding } from './building.mjs';
 
 window.addEventListener('load', () => {
   // Variables for initialising canvas in js
@@ -12,6 +12,10 @@ window.addEventListener('load', () => {
   // variables for setting bug's behaviour to harvest
   let toggleHarvestSelecting = false;
   const selectedForHarvest = [];
+
+  //  variables for setting bug's behaviour to aid in building
+  let toggleBuildingSelecting = false;
+  // let selectedForBuilding = null;
 
   // variables for building placement and creation
   let buildingTemplate = null;
@@ -106,11 +110,6 @@ window.addEventListener('load', () => {
   createNewBuilding('sleeping_den', 100, 100);
   createNewBuilding('sleeping_den', 300, 300);
 
-  // bugsList[1].setBehaviour('building', entityList[1]);
-
-  // console.log(bugsList[1].behaviour);
-  // currentObj = bugsList[1];
-
   addListeners();
   updateFrame();
   decreaseStatsInterval();
@@ -140,6 +139,9 @@ window.addEventListener('load', () => {
         if (toggleHarvestSelecting) { // if selecting is in harvest mode,
           selectedForHarvest.push(obj);
           harvestLogic();
+        } else if (toggleBuildingSelecting) { // if selecting is in building mode,
+          selectedForHarvest[0] = obj;
+          buildingLogic();
         } else { // if selecting is in normal mode,
           if (currentObj === obj) { // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
             // skip this round of the loop
@@ -235,27 +237,51 @@ window.addEventListener('load', () => {
     }
   }
   function harvestLogic() {
-    if (selectedForHarvest[0] instanceof FoodEntity) {
-      // works
-      document.querySelector('#foodSourceName').textContent = selectedForHarvest[0].name;
-      document.querySelector('#harvestAlert').textContent = 'Select the food storage building for food to be deposited into';
+    if (selectedForHarvest[0] instanceof FoodEntity) { // if the first selected object is a food entity,
+      document.querySelector('#building_1_Name').textContent = selectedForHarvest[0].name;
+      document.querySelector('#activityAlert').textContent = 'Select the food storage building for food to be deposited into';
     } else {
       selectedForHarvest.splice(0, 1);
-      document.querySelector('#foodSourceName').textContent = '--';
-      document.querySelector('#harvestAlert').textContent = 'Select the food source target';
+      document.querySelector('#building_1_Name').textContent = '--';
+      document.querySelector('#activityAlert').textContent = 'Select the food source target';
       return;
     }
-    if (selectedForHarvest[1] instanceof FoodStorageBuilding) {
-      // works
-      document.querySelector('#foodStorageName').textContent = selectedForHarvest[1].name;
+    if (selectedForHarvest[1] instanceof FoodStorageBuilding) { // if the second selected object is a food storage,
+      document.querySelector('#building_2_Name').textContent = selectedForHarvest[1].name;
       toggleHarvestSelecting = false;
       currentObj.setBehaviour('harvesting', selectedForHarvest[0], selectedForHarvest[1]);
       selectedForHarvest.splice(0, selectedForHarvest.length); // clear entire array for reuse later
       UpdateStatDisplays();
     } else {
       selectedForHarvest.splice(1, 1);
-      document.querySelector('#foodStorageName').textContent = '--';
-      document.querySelector('#harvestAlert').textContent = 'Select the food storage building for food to be deposited into';
+      document.querySelector('#building_2_Name').style.display = 'block';
+      document.querySelector('#building_2_Name').textContent = '--';
+      document.querySelector('#activityAlert').textContent = 'Select the food storage building for food to be deposited into';
+    }
+  }
+
+  function buildingSelecting() {
+    if (currentObj.behaviour !== 'building') { // start building
+      toggleBuildingSelecting = true;
+
+      document.querySelector('#activityAlert').textContent = 'Click on building you want the bug to help build';
+      document.querySelector('#building_1_Name').style.display = 'none';
+      document.querySelector('#building_2_Name').style.display = 'none';
+
+      UpdateStatDisplays();
+    } else { // cancel building
+      currentObj.setBehaviour('wandering');
+      document.querySelector('#startConstruction').textContent = 'Press to cancel construction';
+    }
+  }
+  function buildingLogic() {
+    if (selectedForHarvest[0] instanceof Building) {
+      currentObj.setBehaviour('building', selectedForHarvest[0]);
+      toggleBuildingSelecting = false;
+
+      UpdateStatDisplays();
+    } else {
+      console.log('bruh');
     }
   }
 
@@ -340,13 +366,17 @@ window.addEventListener('load', () => {
       childOfDiv[index].classList.add('hidden');
     }
 
-    if (currentObj === null) {
-      return;
+    if (currentObj === null) { // if nothing is selected,
+      return; // display nothing.
     }
 
     if (toggleHarvestSelecting) {
-      document.querySelector('#harvestingElems').classList.remove('hidden');
-      document.querySelector('#harvestBugName').textContent = currentObj.name;
+      document.querySelector('#activityElems').classList.remove('hidden');
+      document.querySelector('#activityBugName').textContent = currentObj.name;
+      return;
+    } else if (toggleBuildingSelecting) {
+      document.querySelector('#activityElems').classList.remove('hidden');
+      document.querySelector('#activityBugName').textContent = currentObj.name;
       return;
     }
 
@@ -446,8 +476,9 @@ window.addEventListener('load', () => {
     const deleteGraveButton = document.querySelector('#deleteGrave');
     deleteGraveButton.addEventListener('click', () => deleteGrave(currentObj));
 
-    const toggleHarvestButton = document.querySelector('#startHarvest');
-    toggleHarvestButton.addEventListener('click', harvestSelecting);
+    document.querySelector('#startHarvest').addEventListener('click', harvestSelecting);
+
+    document.querySelector('#aidConstruction').addEventListener('click', buildingSelecting);
 
     const findDenButton = document.querySelector('#findDen');
     findDenButton.addEventListener('click', () => findClosestDen());
