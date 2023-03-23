@@ -92,12 +92,17 @@ export class SleepingDenBuilding extends Building {
 
     this.constructionProgress.complete = 10; // building completion time in seconds
 
+    this.imageStages[0] = document.querySelector('#sleeping_den_stage_0_sprite');
+    this.imageStages[1] = document.querySelector('#sleeping_den_stage_1_sprite');
+    this.imageStages[2] = document.querySelector('#sleeping_den_stage_2_sprite');
+    this.imageStages[3] = document.querySelector('#sleeping_den_sprite');
+
     this.occupancy = 0;
     this.maxOccupancy = 5;
     this.tenants = [];
 
     this.name = 'sleeping den';
-    this.image = document.querySelector('#sleeping_den_sprite');
+    this.image = this.imageStages[0];
   }
 
   addTenant(bugObj) {
