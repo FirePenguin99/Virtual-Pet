@@ -9,13 +9,10 @@ window.addEventListener('load', () => {
 
   const mapImage = document.querySelector('#map');
 
-  // variables for setting bug's behaviour to harvest
+  // variables for setting bug's behaviour to an activity (either Harvesting or Building)
   let toggleHarvestSelecting = false;
-  const selectedForHarvest = [];
-
-  //  variables for setting bug's behaviour to aid in building
+  const selectedForActivity = [];
   let toggleBuildingSelecting = false;
-  // let selectedForBuilding = null;
 
   // variables for building placement and creation
   let buildingTemplate = null;
@@ -44,6 +41,7 @@ window.addEventListener('load', () => {
 
     if (mouseHold) { // if holding down mouse
       if (isPlacingBuilding) { // if currently trying to place building
+        buildingTemplate.moveAcceptCancelButtons(canvasMousePos, visualOffset);
         if (isTemplateSelected) {
           buildingTemplate.moveToCursor(canvasMousePos, visualOffset); // move it to the mouse position
         } else {
@@ -75,9 +73,7 @@ window.addEventListener('load', () => {
     if (isPlacingBuilding) {
       buildingTemplate.checkCollisions(entityList);
       buildingTemplate.draw(ctx, visualOffset);
-      // console.log(buildingTemplate.x + ': ' + buildingTemplate.y + ': ' + visualOffset.x + ',' + visualOffset.y);
     }
-    // console.log(visualOffset);
 
     requestAnimationFrame(updateFrame); // call the function again
   }
@@ -137,10 +133,10 @@ window.addEventListener('load', () => {
         console.log(obj.name);
 
         if (toggleHarvestSelecting) { // if selecting is in harvest mode,
-          selectedForHarvest.push(obj);
+          selectedForActivity.push(obj);
           harvestLogic();
         } else if (toggleBuildingSelecting) { // if selecting is in building mode,
-          selectedForHarvest[0] = obj;
+          selectedForActivity[0] = obj;
           buildingLogic();
         } else { // if selecting is in normal mode,
           if (currentObj === obj) { // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
@@ -230,6 +226,11 @@ window.addEventListener('load', () => {
   function harvestSelecting() {
     if (currentObj.behaviour !== 'harvesting') { // start harvesting
       toggleHarvestSelecting = true;
+
+      document.querySelector('#activityAlert').textContent = 'Click on building you want the bug to help build';
+      document.querySelector('#building_1_Name').style.display = 'block';
+      document.querySelector('#building_2_Name').style.display = 'block';
+
       UpdateStatDisplays();
     } else { // cancel harvesting
       currentObj.setBehaviour('wandering');
@@ -237,23 +238,23 @@ window.addEventListener('load', () => {
     }
   }
   function harvestLogic() {
-    if (selectedForHarvest[0] instanceof FoodEntity) { // if the first selected object is a food entity,
-      document.querySelector('#building_1_Name').textContent = selectedForHarvest[0].name;
+    if (selectedForActivity[0] instanceof FoodEntity) { // if the first selected object is a food entity,
+      document.querySelector('#building_1_Name').textContent = selectedForActivity[0].name;
       document.querySelector('#activityAlert').textContent = 'Select the food storage building for food to be deposited into';
     } else {
-      selectedForHarvest.splice(0, 1);
+      selectedForActivity.splice(0, 1);
       document.querySelector('#building_1_Name').textContent = '--';
       document.querySelector('#activityAlert').textContent = 'Select the food source target';
       return;
     }
-    if (selectedForHarvest[1] instanceof FoodStorageBuilding) { // if the second selected object is a food storage,
-      document.querySelector('#building_2_Name').textContent = selectedForHarvest[1].name;
+    if (selectedForActivity[1] instanceof FoodStorageBuilding) { // if the second selected object is a food storage,
+      document.querySelector('#building_2_Name').textContent = selectedForActivity[1].name;
       toggleHarvestSelecting = false;
-      currentObj.setBehaviour('harvesting', selectedForHarvest[0], selectedForHarvest[1]);
-      selectedForHarvest.splice(0, selectedForHarvest.length); // clear entire array for reuse later
+      currentObj.setBehaviour('harvesting', selectedForActivity[0], selectedForActivity[1]);
+      selectedForActivity.splice(0, selectedForActivity.length); // clear entire array for reuse later
       UpdateStatDisplays();
     } else {
-      selectedForHarvest.splice(1, 1);
+      selectedForActivity.splice(1, 1);
       document.querySelector('#building_2_Name').style.display = 'block';
       document.querySelector('#building_2_Name').textContent = '--';
       document.querySelector('#activityAlert').textContent = 'Select the food storage building for food to be deposited into';
@@ -271,18 +272,25 @@ window.addEventListener('load', () => {
       UpdateStatDisplays();
     } else { // cancel building
       currentObj.setBehaviour('wandering');
-      document.querySelector('#startConstruction').textContent = 'Press to cancel construction';
+      document.querySelector('#startConstruction').textContent = 'Press to start construction';
     }
   }
   function buildingLogic() {
-    if (selectedForHarvest[0] instanceof Building) {
-      currentObj.setBehaviour('building', selectedForHarvest[0]);
+    if (selectedForActivity[0] instanceof Building) {
+      currentObj.setBehaviour('building', selectedForActivity[0]);
       toggleBuildingSelecting = false;
 
       UpdateStatDisplays();
     } else {
       console.log('bruh');
     }
+  }
+  function cancelActivity() {
+    toggleBuildingSelecting = false;
+    toggleHarvestSelecting = false;
+    selectedForActivity.splice(0, selectedForActivity.length); // clear array of already chosen entities
+
+    UpdateStatDisplays();
   }
 
   function findClosestDen() {
@@ -346,7 +354,7 @@ window.addEventListener('load', () => {
       } else if (buildingTemplate.name === 'storageTemplate') {
         entityList.push(new FoodStorageBuilding(buildingTemplate.x, buildingTemplate.y));
       }
-      document.querySelector('#wishMeFuckingLuck').style.display = 'none';
+      document.querySelector('#acceptAndCancel').style.display = 'none';
       isPlacingBuilding = false;
     } else {
       console.log('no can do pal');
@@ -354,7 +362,7 @@ window.addEventListener('load', () => {
   }
   function cancelPlacement() {
     buildingTemplate = null;
-    document.querySelector('#wishMeFuckingLuck').style.display = 'none';
+    document.querySelector('#acceptAndCancel').style.display = 'none';
     isPlacingBuilding = false;
   }
 
@@ -398,6 +406,11 @@ window.addEventListener('load', () => {
         document.querySelector('#startHarvest').textContent = 'Press to cancel harvesting';
       } else {
         document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
+      }
+      if (currentObj.behaviour === 'building') {
+        document.querySelector('#startConstruction').textContent = 'Press to cancel building';
+      } else {
+        document.querySelector('#startConstruction').textContent = 'Press to start building';
       }
 
       if (currentObj.behaviour === 'sleeping') {
@@ -477,8 +490,8 @@ window.addEventListener('load', () => {
     deleteGraveButton.addEventListener('click', () => deleteGrave(currentObj));
 
     document.querySelector('#startHarvest').addEventListener('click', harvestSelecting);
-
-    document.querySelector('#aidConstruction').addEventListener('click', buildingSelecting);
+    document.querySelector('#startConstruction').addEventListener('click', buildingSelecting);
+    document.querySelector('#cancelActivity').addEventListener('click', cancelActivity);
 
     const findDenButton = document.querySelector('#findDen');
     findDenButton.addEventListener('click', () => findClosestDen());

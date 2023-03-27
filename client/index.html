@@ -65,7 +65,7 @@
         position: fixed;
     }
 
-    #wishMeFuckingLuck {
+    #acceptAndCancel {
         display: flex;
         position: absolute;
         left: 500px;
@@ -78,21 +78,21 @@
 <body>
 <script type='module' src="main.mjs"></script>
 
-<div id="pet">
+<section id="pet">
     <canvas id="canvas1" width="1200" height = "800"></canvas>
     
-    <div id="UI">
+    <section id="UI">
         <p id="nameDisplay"> name: </p>
         <p id="foodDisplay"> food: </p>
-        <div id="bugStats">
+        <aside id="bugStats">
             <p id="cleanlinessDisplay"> cleanliness: </p>
             <p id="sleepDisplay"> energy: </p>
             <p id="happinessDisplay"> happiness: </p>
-        </div>
+        </aside>
         
         <button id="newBug"> Press to create new Bug</button>
         
-        <div id="bugButtons">
+        <aside id="bugButtons">
             <button id="plusFood"> Press to feed </button>
             <button id="plusClean"> Press to clean </button>
             <button id="plusSleep"> Press to put to sleep </button>
@@ -102,8 +102,8 @@
 
             <button id="startHarvest"> Press to start harvesting </button>
             <button id="findDen"> Press to send the bug to the closest sleeping den </button>
-            <button id="aidConstruction"> Press to aid in Construction </button>
-        </div>
+            <button id="startConstruction"> Press to aid in Construction </button>
+        </aside>
 
         <aside id="graveElems">
             <p id="birthdayDisplay"> date of birth: </p>
@@ -113,40 +113,33 @@
             <button id="deleteGrave"> Press to clean away grave </button>
         </aside>
 
-        <div id="activityElems">
+        <aside id="activityElems">
             <p id="activityAlert"> Select the food source target </p>
             <p id="activityBugName"> -- </p>
             <p id="building_1_Name"> -- </p>
             <p id="building_2_Name"> -- </p>
             <button id="cancelActivity"> Press to cancel harvesting </button>
-        </div>
+        </aside>
 
-        <!-- <div id="aidConstructionElems">
-            <p id="constructionAlert"> Select the food source target </p>
-            <p id="constructionBugName"> -- </p>
-            <p id="buildingName"> -- </p>
-            <button id="cancelAidConstruction"> Press to cancel harvesting </button>
-        </div> -->
-
-        <div id="denElems">
+        <aside id="denElems">
             <p id="occupancy"> occupancy: </p>
-            <div id="tenantButtons">
+            <section id="tenantButtons">
                 <button id="tenant_1"> Press to wake up: </button>
                 <button id="tenant_2"> Press to wake up: </button>
                 <button id="tenant_3"> Press to wake up: </button>
                 <button id="tenant_4"> Press to wake up: </button>
                 <button id="tenant_5"> Press to wake up: </button>
-            </div>
-        </div>
-    </div>
-</div>
+            </section>
+        </aside>
+    </section>
+</section>
 
 <div id="buildingWindow">
     <button id="buildADen"> build a den </button>
     <button id="buildAStorage"> build a storage </button>
 </div>
 
-<div id="wishMeFuckingLuck" class="hidden">
+<div id="acceptAndCancel" class="hidden">
     <button id="accept"> Accept </button>
     <button id="cancel"> Cancel </button>
 </div>

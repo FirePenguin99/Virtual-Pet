@@ -127,10 +127,10 @@ export class TemplateBuildingEntity extends Entity {
     super(name, spawnX, spawnY, width, height, image);
     this.canPlace = true;
 
-    document.querySelector('#wishMeFuckingLuck').style.display = 'flex';
+    document.querySelector('#acceptAndCancel').style.display = 'flex';
 
-    document.querySelector('#wishMeFuckingLuck').style.top = (this.bounds.bottom - 10) + 'px';
-    document.querySelector('#wishMeFuckingLuck').style.left = (this.bounds.left - 10) + 'px';
+    document.querySelector('#acceptAndCancel').style.top = (this.bounds.bottom - 10) + 'px';
+    document.querySelector('#acceptAndCancel').style.left = (this.bounds.left - 10) + 'px';
   }
 
   draw(context, offset) {
@@ -150,9 +150,11 @@ export class TemplateBuildingEntity extends Entity {
     this.x = cursorCoords.x - offset.x;
     this.y = cursorCoords.y - offset.y;
     this.recalculateBounds();
+  }
 
-    document.querySelector('#wishMeFuckingLuck').style.top = (this.bounds.bottom - 10) + 'px';
-    document.querySelector('#wishMeFuckingLuck').style.left = (this.bounds.left - 10) + 'px';
+  moveAcceptCancelButtons(cursorCoords, offset) {
+    document.querySelector('#acceptAndCancel').style.top = (this.bounds.bottom - 10 + offset.y) + 'px';
+    document.querySelector('#acceptAndCancel').style.left = (this.bounds.left - 10 + offset.x) + 'px';
   }
 
   checkCollisions(entityList) {
