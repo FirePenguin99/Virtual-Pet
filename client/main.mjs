@@ -7,6 +7,8 @@ window.addEventListener('load', () => {
   const canvas = document.querySelector('#canvas1');
   const ctx = canvas.getContext('2d');
 
+  ctx.canvas.width = window.innerWidth;
+
   const mapImage = document.querySelector('#map');
 
   // variables for setting bug's behaviour to an activity (either Harvesting or Building)
@@ -36,12 +38,11 @@ window.addEventListener('load', () => {
     fpsCounter.textContent = 'FPS: ' + Math.floor(1000 / deltaTime);
 
     //  ---- set the canvas dimensions to the dimensions of the window ----
-    ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+    ctx.canvas.height = document.querySelector('html').clientHeight;
 
     if (mouseHold) { // if holding down mouse
       if (isPlacingBuilding) { // if currently trying to place building
-        buildingTemplate.moveAcceptCancelButtons(canvasMousePos, visualOffset);
+        buildingTemplate.moveAcceptCancelButtons(visualOffset);
         if (isTemplateSelected) {
           buildingTemplate.moveToCursor(canvasMousePos, visualOffset); // move it to the mouse position
         } else {
@@ -340,10 +341,10 @@ window.addEventListener('load', () => {
 
   function placeNewBuilding(newBuildingType) {
     if (newBuildingType === 'den') {
-      buildingTemplate = (new TemplateBuildingEntity('denTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 100, document.querySelector('#sleeping_den_sprite')));
+      buildingTemplate = (new TemplateBuildingEntity('denTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 100, document.querySelector('#sleeping_den_sprite'), visualOffset));
       isPlacingBuilding = true;
     } else if (newBuildingType === 'storage') {
-      buildingTemplate = (new TemplateBuildingEntity('storageTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, document.querySelector('#food_storage_sprite')));
+      buildingTemplate = (new TemplateBuildingEntity('storageTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, document.querySelector('#food_storage_sprite'), visualOffset));
       isPlacingBuilding = true;
     }
   }

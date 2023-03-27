@@ -123,14 +123,13 @@ export class SelectionEntity extends Entity {
 }
 
 export class TemplateBuildingEntity extends Entity {
-  constructor(name, spawnX, spawnY, width, height, image) {
+  constructor(name, spawnX, spawnY, width, height, image, offset) {
     super(name, spawnX, spawnY, width, height, image);
     this.canPlace = true;
 
     document.querySelector('#acceptAndCancel').style.display = 'flex';
 
-    document.querySelector('#acceptAndCancel').style.top = (this.bounds.bottom - 10) + 'px';
-    document.querySelector('#acceptAndCancel').style.left = (this.bounds.left - 10) + 'px';
+    this.moveAcceptCancelButtons(offset);
   }
 
   draw(context, offset) {
@@ -152,7 +151,7 @@ export class TemplateBuildingEntity extends Entity {
     this.recalculateBounds();
   }
 
-  moveAcceptCancelButtons(cursorCoords, offset) {
+  moveAcceptCancelButtons(offset) {
     document.querySelector('#acceptAndCancel').style.top = (this.bounds.bottom - 10 + offset.y) + 'px';
     document.querySelector('#acceptAndCancel').style.left = (this.bounds.left - 10 + offset.x) + 'px';
   }
