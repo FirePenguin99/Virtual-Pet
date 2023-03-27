@@ -111,7 +111,8 @@ export class Bug {
   }
 
   moveLerp(overallSpeed) { // speed is amount per second
-    if (this.moveDestination.x === this.x && this.moveDestination.y === this.y) { // If the bug is at its destination then break
+    // If the bug is at its destination then depending on why they travelled, do something
+    if (this.moveDestination.x === this.x && this.moveDestination.y === this.y) {
       this.movingState = 'idle';
 
       if (this.behaviour === 'harvesting') {
@@ -123,6 +124,8 @@ export class Bug {
         this.isInDen = true;
       } else if (this.behaviour === 'moveToBuilding') {
         this.behaviour = 'building';
+      } else if (this.behaviour === 'moveToFood') {
+        this.behaviour = 'feeding';
       }
       return;
     }
@@ -157,11 +160,15 @@ export class Bug {
     } else if (this.behaviour === 'sleeping') {
       this.sleepingBehaviour(deltaTime);
     } else if (this.behaviour === 'moveToDen') {
-      this.moveToBehaviour(this.entityTarget);
+      this.moveToBehaviour();
     } else if (this.behaviour === 'moveToBuilding') {
-      this.moveToBehaviour(this.entityTarget);
+      this.moveToBehaviour();
     } else if (this.behaviour === 'building') {
       this.startBuilding(deltaTime);
+    } else if (this.behaviour === 'moveToFood') {
+      this.moveToBehaviour();
+    } else if (this.behaviour === 'feeding') {
+      this.startFeeding(deltaTime);
     }
 
     if (this.movingState === 'moving') {
@@ -205,9 +212,9 @@ export class Bug {
     }
   }
 
-  moveToBehaviour(target) {
-    this.moveDestination.x = target.x;
-    this.moveDestination.y = target.y;
+  moveToBehaviour() {
+    this.moveDestination.x = this.entityTarget.x;
+    this.moveDestination.y = this.entityTarget.y;
     this.movingState = 'moving';
   }
 
@@ -235,6 +242,16 @@ export class Bug {
     this.entityTarget.construct(deltaTime / 1000);
   }
 
+  startFeeding(deltaTime) {
+    if (this.entityTarget.foodInventory > 0 && this.food < 100) {
+      this.food += (deltaTime / 1000 * 5);
+      this.entityTarget.decreaseFood(deltaTime / 1000 * 5);
+    } else {
+      this.behaviour = 'wandering';
+      this.entityTarget = null;
+    }
+  }
+
   setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
     if (arguments.length === 0) {
       // return;
@@ -254,6 +271,9 @@ export class Bug {
       this.entityTarget = arguments[1];
     } else if (arguments[0] === 'building') {
       this.behaviour = 'moveToBuilding';
+      this.entityTarget = arguments[1];
+    } else if (arguments[0] === 'moveToFood') {
+      this.behaviour = 'moveToFood';
       this.entityTarget = arguments[1];
     }
   }

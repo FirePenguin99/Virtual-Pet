@@ -349,6 +349,32 @@ window.addEventListener('load', () => {
       }
     }
   }
+  function findClosestFood() {
+    if (currentObj.behaviour === 'feeding') { // if already eating, then wake up
+      currentObj.setBehaviour('wandering');
+      document.querySelector('#findFood').textContent = 'Press to send the bug to the closest food source';
+    } else { // find closest food source and set behaviour to moveToFood
+      let closestFoodValue = null;
+      let closestFoodObj = null;
+      for (const building of entityList) { // Loop through array containing all buildings
+        if (building instanceof FoodStorageBuilding && building.foodInventory > 0) { // check if the building is a Food Storage and not empty
+          const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
+          // console.log(distanceFromDen);
+          if (closestFoodValue === null || distanceFromDen < closestFoodValue) {
+            closestFoodValue = distanceFromDen;
+            closestFoodObj = building;
+            // console.log(closestDenObj);
+          }
+        }
+      }
+
+      if (closestFoodObj === null) {
+        console.log('no food source found');
+      } else {
+        currentObj.setBehaviour('moveToFood', closestFoodObj);
+      }
+    }
+  }
 
   function createNewEntity(newEntityType) {
     if (newEntityType === 'food') {
@@ -520,8 +546,8 @@ window.addEventListener('load', () => {
     document.querySelector('#startConstruction').addEventListener('click', buildingSelecting);
     document.querySelector('#cancelActivity').addEventListener('click', cancelActivity);
 
-    const findDenButton = document.querySelector('#findDen');
-    findDenButton.addEventListener('click', () => findClosestDen());
+    document.querySelector('#findDen').addEventListener('click', findClosestDen);
+    document.querySelector('#findFood').addEventListener('click', findClosestFood);
 
     const canvas = document.getElementById('canvas1');
 
