@@ -435,7 +435,7 @@ window.addEventListener('load', () => {
       document.querySelector('#denElems').classList.remove('hidden');
       document.querySelector('#occupancy').textContent = 'occupancy: ' + currentObj.occupancy + '/' + currentObj.maxOccupancy;
       for (const tenantButton of document.querySelector('#tenantButtons').children) { // loops through button elements and hides them all
-        tenantButton.style.display = 'none';
+        tenantButton.classList.add('hidden');
       }
       for (const tenant of currentObj.tenants) { // loops through tenants in the den, and displays and updates buttons depending on the amount of tenants.
         const button = document.querySelector('#tenant_' + (currentObj.tenants.indexOf(tenant) + 1));
