@@ -7,8 +7,6 @@ window.addEventListener('load', () => {
   const canvas = document.querySelector('#canvas1');
   const ctx = canvas.getContext('2d');
 
-  ctx.canvas.width = window.innerWidth;
-
   const mapImage = document.querySelector('#map');
 
   // variables for setting bug's behaviour to an activity (either Harvesting or Building)
@@ -42,6 +40,8 @@ window.addEventListener('load', () => {
 
     //  ---- set the canvas dimensions to the dimensions of the window ----
     ctx.canvas.height = document.querySelector('html').clientHeight;
+    ctx.canvas.width = document.querySelector('html').clientWidth;
+
 
     // if holding down mouse
     if (mouseHold) {
