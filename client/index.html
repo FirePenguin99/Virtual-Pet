@@ -1,82 +1,11 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Virtual Pet</title>
+<script type='module' src="main.mjs"></script>
+<link rel="stylesheet" href="index_style.css">
 
-<style> 
-    *{
-        box-sizing: border-box;
-        border: 0;
-        margin: 0;
-        padding: 0;
-    }
-    
-    p{
-        margin: 0.5em;
-    }
-
-    img{
-        display: none;
-    }
-
-    button{
-        display: block;
-        margin: 1em;
-        border: 1px solid black;
-        padding: 0.5em;
-    }
-
-    #canvas1{
-        float: left;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    #UI{
-        position: relative;
-        float: right;
-        padding-right: 5em;
-        border: 2px solid black;
-        background-color: white;  
-        width: 15%;  
-    }
-
-    .hidden{
-        display: none;
-    }
-
-    /* #buildingWindow{
-        justify-content: center;
-        display: flex;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    #buildButtons {
-        min-width: 75%;
-        min-height: 25%;
-        font-size: larger;
-    } */
-
-    #buildingWindow{
-        justify-content: center;
-        display: flex;
-        position: fixed;
-    }
-
-    #acceptAndCancel {
-        display: flex;
-        position: absolute;
-        left: 500px;
-        top: 500px;
-        display: none;
-    }
 
 </style>
-
-<body>
-<script type='module' src="main.mjs"></script>
 
 <section id="pet">
     <canvas id="canvas1" width="1200" height = "800"></canvas>
@@ -167,5 +96,3 @@
 <div id="UI">
     <p id="fpsCounter"> FPS: </p>    
 </div>
-
-</body>

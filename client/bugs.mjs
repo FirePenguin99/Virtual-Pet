@@ -4,10 +4,10 @@ export class Bug {
 
     this.name = name;
     this.type = type;
-    this.food = 50;
-    this.sleep = 50;
-    this.cleanliness = 50;
-    this.happiness = 50;
+    this.food = 100;
+    this.sleep = 100;
+    this.cleanliness = 100;
+    this.happiness = 100;
     // this.speed = 2;
 
     this.x = spawnX;

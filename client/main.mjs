@@ -27,12 +27,15 @@ window.addEventListener('load', () => {
   const visualOffset = { x: 0, y: 0 };
   let oldPos = null;
 
-  let previousTimeStamp = 0; // initialising previousTimeStamp for use in updateFrame()
+  // initialising previousTimeStamp for use in updateFrame()
+  let previousTimeStamp = 0;
   const fpsCounter = document.querySelector('#fpsCounter');
 
-  function updateFrame(timeStamp) { // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
+  // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
+  function updateFrame(timeStamp) {
     //  ---- calculate deltaTime ----
-    if (timeStamp == null) { timeStamp = 16.6666; } // This is because in the first frame the timestamp == null for some reason. Therefore when it does, just set it to what the value would approximately be so it doesn't break the rest of the code.
+    // This is because in the first frame the timestamp == null for some reason. Therefore when it does, just set it to what the value would approximately be so it doesn't break the rest of the code.
+    if (timeStamp == null) { timeStamp = 16.6666; }
     const deltaTime = timeStamp - previousTimeStamp;
     previousTimeStamp = timeStamp;
     fpsCounter.textContent = 'FPS: ' + Math.floor(1000 / deltaTime);
@@ -40,34 +43,46 @@ window.addEventListener('load', () => {
     //  ---- set the canvas dimensions to the dimensions of the window ----
     ctx.canvas.height = document.querySelector('html').clientHeight;
 
-    if (mouseHold) { // if holding down mouse
-      if (isPlacingBuilding) { // if currently trying to place building
+    // if holding down mouse
+    if (mouseHold) {
+      // if currently trying to place building
+      if (isPlacingBuilding) {
         buildingTemplate.moveAcceptCancelButtons(visualOffset);
         if (isTemplateSelected) {
-          buildingTemplate.moveToCursor(canvasMousePos, visualOffset); // move it to the mouse position
+          // move it to the mouse position
+          buildingTemplate.moveToCursor(canvasMousePos, visualOffset);
         } else {
-          moveMap(); // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
+          // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
+          moveMap();
         }
       } else {
-        moveMap(); // two instances of moveMap since this one gets disabled if isPlacingBuilding is true, which is not correct, map should not move when moving the template
+        // two instances of moveMap since this one gets disabled if isPlacingBuilding is true, which is not correct, map should not move when moving the template
+        moveMap();
       }
     }
 
     // ---- For clearing and redrawing the objects in the scene, as well as bug behaviour  ----
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clears the entire canvas element
+    // clears the entire canvas element
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    ctx.fillStyle = '#808080'; // grey void behind the map image
+    // grey void behind the map image
+    ctx.fillStyle = '#808080';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    mapObject.draw(ctx, visualOffset); // draw map image
+    // draw map image
+    mapObject.draw(ctx, visualOffset);
 
     selectEntity.drawSelectedObject(currentObj, ctx, visualOffset);
 
-    for (const bug of bugsList) { // Loop through array containing all Bugs, and call their draw() method.
+    // Loop through array containing all Bugs, and call their draw() method and behaviour logic.
+    for (const bug of bugsList) {
+      // draw each bug
       bug.draw(ctx, visualOffset);
-      bug.runBehaviourLogic(deltaTime); // logic for each bug's behaviour
+      // logic for each bug's behaviour
+      bug.runBehaviourLogic(deltaTime);
     }
-    for (const entity of entityList) { // Loop through array containing all Entities, and call their draw() method.
+    // Loop through array containing all Entities, and call their draw() method.
+    for (const entity of entityList) {
       entity.draw(ctx, visualOffset);
     }
 
@@ -76,7 +91,8 @@ window.addEventListener('load', () => {
       buildingTemplate.draw(ctx, visualOffset);
     }
 
-    requestAnimationFrame(updateFrame); // call the function again
+    // call the function again
+    requestAnimationFrame(updateFrame);
   }
 
   const mapObject = new Entity('map', 1000, 500, 3000, 3000, mapImage);
@@ -111,21 +127,25 @@ window.addEventListener('load', () => {
   updateFrame();
   decreaseStatsInterval();
 
-
-  function selectObject() { // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
-    if (isPlacingBuilding) { // if the user is trying to place a new building,
-      if (canvasMousePos.x >= buildingTemplate.bounds.left + visualOffset.x && // if mouse is within the bounds of the building template
+  // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
+  function selectObject() {
+    // if the user is trying to place a new building,
+    if (isPlacingBuilding) {
+      // if mouse is within the bounds of the building template
+      if (canvasMousePos.x >= buildingTemplate.bounds.left + visualOffset.x &&
         canvasMousePos.x <= buildingTemplate.bounds.right + visualOffset.x &&
         canvasMousePos.y >= buildingTemplate.bounds.top + visualOffset.y &&
         canvasMousePos.y <= buildingTemplate.bounds.bottom + visualOffset.y) {
         isTemplateSelected = true;
-      } else { // if cursor not in bounds
+      // if cursor not in bounds
+      } else {
         isTemplateSelected = false;
       }
       return;
     }
 
-    const bugsAndEntity = bugsList.concat(entityList); // combine bugs and entity arrays
+    // combine bugs and entity arrays
+    const bugsAndEntity = bugsList.concat(entityList);
     for (const obj of bugsAndEntity) {
       if (canvasMousePos.x >= obj.bounds.left + visualOffset.x && // Adds visualOffset to the bound calculates, rather than the bounds itself.
         canvasMousePos.x <= obj.bounds.right + visualOffset.x && // This prevents the bug's bounds not being able to be used in collision detection later on, And also the moving of the map is a user and visual feature, so adding visualOffset in selectBug (a user and visual feature) only makes sense.
@@ -133,16 +153,18 @@ window.addEventListener('load', () => {
         canvasMousePos.y <= obj.bounds.bottom + visualOffset.y) {
         console.log(obj.name);
 
-        if (toggleHarvestSelecting) { // if selecting is in harvest mode,
+        // if selecting is in harvest mode,
+        if (toggleHarvestSelecting) {
           selectedForActivity.push(obj);
           harvestLogic();
-        } else if (toggleBuildingSelecting) { // if selecting is in building mode,
+        // if selecting is in building mode,
+        } else if (toggleBuildingSelecting) {
           selectedForActivity[0] = obj;
           buildingLogic();
-        } else { // if selecting is in normal mode,
-          if (currentObj === obj) { // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
-            // skip this round of the loop
-          } else {
+        // if selecting is in normal mode,
+        } else {
+          // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
+          if (currentObj !== obj) {
             currentObj = obj;
             UpdateStatDisplays();
             return;
@@ -154,7 +176,8 @@ window.addEventListener('load', () => {
     }
   }
 
-  function mouseDown() { // Called by event listeners on mouse down and mouse up. Toggles a bool variable which represents the mouse's state
+  // Called by event listeners on mouse down and mouse up. Toggles a bool variable which represents the mouse's state
+  function mouseDown() {
     mouseHold = true;
     oldPos = null;
 
@@ -165,7 +188,8 @@ window.addEventListener('load', () => {
     oldPos = null;
     isTemplateSelected = false;
   }
-  function calculateMousePos(event) { // Is run every time the mouse moves, and writes to a global variable.
+  // Is run every time the mouse moves, and writes to a global variable.
+  function calculateMousePos(event) {
     const bounds = canvas.getBoundingClientRect();
     canvasMousePos = {
       x: event.clientX - bounds.left,
@@ -445,7 +469,8 @@ window.addEventListener('load', () => {
       }
     }
   }
-  function decreaseStatsInterval() { // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
+  // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
+  function decreaseStatsInterval() {
     for (const bug of bugsList) {
       if (bug.sleep <= 0 || bug.behaviour === 'sleeping') {
         bug.setBehaviour('sleeping');
@@ -470,7 +495,8 @@ window.addEventListener('load', () => {
     UpdateStatDisplays();
   }
 
-  function addListeners() { // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
+  // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
+  function addListeners() {
     const feedButton = document.querySelector('#plusFood');
     feedButton.addEventListener('click', () => currentObj.increaseFood(2));
     const cleanButton = document.querySelector('#plusClean');
