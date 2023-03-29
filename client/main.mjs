@@ -91,6 +91,8 @@ window.addEventListener('load', () => {
       buildingTemplate.draw(ctx, visualOffset);
     }
 
+    UpdateStatDisplays();
+
     // call the function again
     requestAnimationFrame(updateFrame);
   }
