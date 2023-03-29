@@ -168,7 +168,7 @@ window.addEventListener('load', () => {
           // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
           if (currentObj !== obj) {
             currentObj = obj;
-            UpdateStatDisplays();
+            // UpdateStatDisplays();
             return;
           }
         }
@@ -220,7 +220,7 @@ window.addEventListener('load', () => {
 
     currentObj = bugsList[bugNumber];
     bugNumber = bugNumber + 1;
-    UpdateStatDisplays();
+    // UpdateStatDisplays();
   }
   function checkBugDeath(bugObj) {
     if (bugObj.food <= 0) {
@@ -237,7 +237,7 @@ window.addEventListener('load', () => {
     bugNumber += -1;
     if (currentObj === bugObj) {
       currentObj = null;
-      UpdateStatDisplays();
+      // UpdateStatDisplays();
     }
   }
   function deleteGrave(graveObj) {
@@ -246,7 +246,7 @@ window.addEventListener('load', () => {
     entityList.splice(graveIndex, 1);
     if (currentObj === graveObj) {
       currentObj = null;
-      UpdateStatDisplays();
+      // UpdateStatDisplays();
     }
   }
 
@@ -258,7 +258,7 @@ window.addEventListener('load', () => {
       document.querySelector('#building_1_Name').style.display = 'block';
       document.querySelector('#building_2_Name').style.display = 'block';
 
-      UpdateStatDisplays();
+      // UpdateStatDisplays();
     } else { // cancel harvesting
       currentObj.setBehaviour('wandering');
       document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
@@ -279,7 +279,7 @@ window.addEventListener('load', () => {
       toggleHarvestSelecting = false;
       currentObj.setBehaviour('harvesting', selectedForActivity[0], selectedForActivity[1]);
       selectedForActivity.splice(0, selectedForActivity.length); // clear entire array for reuse later
-      UpdateStatDisplays();
+      // UpdateStatDisplays();
     } else {
       selectedForActivity.splice(1, 1);
       document.querySelector('#building_2_Name').style.display = 'block';
@@ -296,7 +296,7 @@ window.addEventListener('load', () => {
       document.querySelector('#building_1_Name').style.display = 'none';
       document.querySelector('#building_2_Name').style.display = 'none';
 
-      UpdateStatDisplays();
+      // UpdateStatDisplays();
     } else { // cancel building
       currentObj.setBehaviour('wandering');
       document.querySelector('#startConstruction').textContent = 'Press to start construction';
@@ -307,7 +307,7 @@ window.addEventListener('load', () => {
       currentObj.setBehaviour('building', selectedForActivity[0]);
       toggleBuildingSelecting = false;
 
-      UpdateStatDisplays();
+      // UpdateStatDisplays();
     } else {
       console.log('bruh');
     }
@@ -319,7 +319,7 @@ window.addEventListener('load', () => {
 
     currentObj.cancelActivity();
 
-    UpdateStatDisplays();
+    // UpdateStatDisplays();
   }
 
   function findClosestDen() {
@@ -513,7 +513,7 @@ window.addEventListener('load', () => {
     setTimeout(decreaseStatsInterval, 5000);
 
     // update all the attribute displays to represent the selected pet
-    UpdateStatDisplays();
+    // UpdateStatDisplays();
   }
 
   // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
@@ -568,6 +568,6 @@ window.addEventListener('load', () => {
   function removeTenantButton(i) {
     console.log(currentObj.tenants[i]);
     currentObj.removeTenant(currentObj.tenants[i]);
-    UpdateStatDisplays();
+    // UpdateStatDisplays();
   }
 });
