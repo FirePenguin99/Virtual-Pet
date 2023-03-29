@@ -8,7 +8,6 @@ export class Bug {
     this.sleep = 100;
     this.cleanliness = 100;
     this.happiness = 100;
-    // this.speed = 2;
 
     this.x = spawnX;
     this.y = spawnY;
@@ -34,13 +33,11 @@ export class Bug {
     this.storeTarget = null;
     this.foodInventory = 0;
 
-    this.denTarget = null;
     this.isInDen = false;
-
-    this.buildingTarget = null;
 
     this.entityTarget = null;
   }
+
 
   reduceFood() {
     this.food -= 2;
@@ -83,7 +80,7 @@ export class Bug {
 
   calculateHappiness() {
     this.happiness = (this.food + this.cleanliness + this.sleep) / 3;
-    document.querySelector('#happinessDisplay').textContent = 'happiness: ' + this.happiness;
+    document.querySelector('#happinessDisplay').textContent = 'happiness: ' + Math.trunc(this.happiness);
   }
 
 
@@ -99,6 +96,7 @@ export class Bug {
       bottom: this.y + (this.height / 2),
     };
   }
+
 
   calculateSpeed() {
     if (this.sleep > 80) {
@@ -150,23 +148,55 @@ export class Bug {
     this.recalculateBounds(); // bug has moved, and therefore must recalculate its bounds so it can be clicked on correctly
   }
 
+  moveToBehaviour(target) {
+    this.moveDestination.x = target.x;
+    this.moveDestination.y = target.y;
+    this.movingState = 'moving';
+  }
+
+  setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
+    if (arguments.length === 0) {
+      // return;
+    } else if (arguments[0] === 'wandering') {
+      this.behaviour = 'wandering';
+      this.movingState = 'idle'; // describes if the bug is moving or idle
+      this.wanderInterval = 2000;
+      this.wanderTimer = 0;
+    } else if (arguments[0] === 'harvesting') {
+      this.behaviour = 'harvesting';
+      this.harvestTarget = arguments[1];
+      this.storeTarget = arguments[2];
+    } else if (arguments[0] === 'sleeping') {
+      this.behaviour = 'sleeping';
+    } else if (arguments[0] === 'moveToDen') {
+      this.behaviour = 'moveToDen';
+      this.entityTarget = arguments[1];
+    } else if (arguments[0] === 'building') {
+      this.behaviour = 'moveToBuilding';
+      this.entityTarget = arguments[1];
+    } else if (arguments[0] === 'moveToFood') {
+      this.behaviour = 'moveToFood';
+      this.entityTarget = arguments[1];
+    }
+  }
+
   runBehaviourLogic(deltaTime) {
     if (this.behaviour === 'wandering') {
       this.wanderingBehaviour(deltaTime);
     } else if (this.behaviour === 'harvesting') { // if harvesting then set its movement target to the coords of the harvest target
-      this.harvestingBehaviour();
+      this.moveToBehaviour(this.harvestTarget);
     } else if (this.behaviour === 'storing') { // if storing then set its movement target to the coords of the storing target
-      this.storingBehaviour();
+      this.moveToBehaviour(this.storeTarget);
     } else if (this.behaviour === 'sleeping') {
       this.sleepingBehaviour(deltaTime);
     } else if (this.behaviour === 'moveToDen') {
-      this.moveToBehaviour();
+      this.moveToBehaviour(this.entityTarget);
     } else if (this.behaviour === 'moveToBuilding') {
-      this.moveToBehaviour();
+      this.moveToBehaviour(this.entityTarget);
     } else if (this.behaviour === 'building') {
       this.startBuilding(deltaTime);
     } else if (this.behaviour === 'moveToFood') {
-      this.moveToBehaviour();
+      this.moveToBehaviour(this.entityTarget);
     } else if (this.behaviour === 'feeding') {
       this.startFeeding(deltaTime);
     }
@@ -188,18 +218,6 @@ export class Bug {
     this.wanderTimer += deltaTime;
   }
 
-  harvestingBehaviour() {
-    this.moveDestination.x = this.harvestTarget.x;
-    this.moveDestination.y = this.harvestTarget.y;
-    this.movingState = 'moving';
-  }
-
-  storingBehaviour() {
-    this.moveDestination.x = this.storeTarget.x;
-    this.moveDestination.y = this.storeTarget.y;
-    this.movingState = 'moving';
-  }
-
   sleepingBehaviour() {
     if (this.sleep >= 100) { // if finished sleeping
       if (this.isInDen) { // if its in a den,
@@ -210,12 +228,6 @@ export class Bug {
     } else { // if sleeping,
       this.movingState = 'idle';
     }
-  }
-
-  moveToBehaviour() {
-    this.moveDestination.x = this.entityTarget.x;
-    this.moveDestination.y = this.entityTarget.y;
-    this.movingState = 'moving';
   }
 
   enterDen() {
@@ -252,32 +264,6 @@ export class Bug {
     }
   }
 
-  setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
-    if (arguments.length === 0) {
-      // return;
-    } else if (arguments[0] === 'wandering') {
-      this.behaviour = 'wandering';
-      this.movingState = 'idle'; // describes if the bug is moving or idle
-      this.wanderInterval = 2000;
-      this.wanderTimer = 0;
-    } else if (arguments[0] === 'harvesting') {
-      this.behaviour = 'harvesting';
-      this.harvestTarget = arguments[1];
-      this.storeTarget = arguments[2];
-    } else if (arguments[0] === 'sleeping') {
-      this.behaviour = 'sleeping';
-    } else if (arguments[0] === 'moveToDen') {
-      this.behaviour = 'moveToDen';
-      this.entityTarget = arguments[1];
-    } else if (arguments[0] === 'building') {
-      this.behaviour = 'moveToBuilding';
-      this.entityTarget = arguments[1];
-    } else if (arguments[0] === 'moveToFood') {
-      this.behaviour = 'moveToFood';
-      this.entityTarget = arguments[1];
-    }
-  }
-
 
   withdrawFood(amount) {
     if (this.harvestTarget.foodInventory <= 0) {
@@ -293,6 +279,15 @@ export class Bug {
     this.storeTarget.increaseFood(amount);
     this.foodInventory -= amount;
     this.behaviour = 'harvesting';
+  }
+
+  cancelActivity() {
+    this.behaviour = 'wandering';
+    this.movingState = 'idle';
+
+    this.harvestTarget = null;
+    this.storeTarget = null;
+    this.entityTarget = null;
   }
 }
 

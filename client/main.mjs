@@ -315,6 +315,8 @@ window.addEventListener('load', () => {
     toggleHarvestSelecting = false;
     selectedForActivity.splice(0, selectedForActivity.length); // clear array of already chosen entities
 
+    currentObj.cancelActivity();
+
     UpdateStatDisplays();
   }
 
@@ -323,7 +325,7 @@ window.addEventListener('load', () => {
       currentObj.setBehaviour('wandering');
       document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
       if (currentObj.isInDen) {
-        currentObj.denTarget.removeTenant(currentObj);
+        currentObj.entityTarget.removeTenant(currentObj);
       } else {
         currentObj.setBehaviour('wandering');
       }
@@ -417,12 +419,14 @@ window.addEventListener('load', () => {
     isPlacingBuilding = false;
   }
 
-
   function UpdateStatDisplays() {
     // update all the attribute displays to represent the selected pet
     const childOfDiv = document.querySelector('#UI').children; // Hide all child elements of the UI div
     for (let index = 0; index < childOfDiv.length; index++) {
       childOfDiv[index].classList.add('hidden');
+      if (childOfDiv[index].id === 'bugButtons') {
+        console.log('bugButtons hidden dumbass');
+      }
     }
 
     if (currentObj === null) { // if nothing is selected,
@@ -443,8 +447,6 @@ window.addEventListener('load', () => {
     document.querySelector('#nameDisplay').textContent = 'name: ' + currentObj.name;
 
     if (currentObj instanceof Bug) { // Show and update only the relevent child elements
-      document.querySelector('#bugButtons').classList.remove('hidden');
-
       document.querySelector('#foodDisplay').classList.remove('hidden');
       document.querySelector('#bugStats').classList.remove('hidden');
 
@@ -453,21 +455,12 @@ window.addEventListener('load', () => {
       document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentObj.sleep;
       document.querySelector('#happinessDisplay').textContent = 'happiness: ' + currentObj.happiness;
 
-      if (currentObj.behaviour === 'harvesting') {
-        document.querySelector('#startHarvest').textContent = 'Press to cancel harvesting';
+      if (currentObj.behaviour === 'wandering') {
+        document.querySelector('#bugButtons').classList.remove('hidden');
+        console.log('not up to much');
       } else {
-        document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
-      }
-      if (currentObj.behaviour === 'building') {
-        document.querySelector('#startConstruction').textContent = 'Press to cancel building';
-      } else {
-        document.querySelector('#startConstruction').textContent = 'Press to start building';
-      }
-
-      if (currentObj.behaviour === 'sleeping') {
-        document.querySelector('#findDen').textContent = 'Press to wake up';
-      } else {
-        document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
+        document.querySelector('#cancelCurrentActivity').classList.remove('hidden');
+        console.log('doin something man');
       }
 
       if (currentObj instanceof Queen) {
@@ -523,18 +516,18 @@ window.addEventListener('load', () => {
 
   // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
   function addListeners() {
-    const feedButton = document.querySelector('#plusFood');
-    feedButton.addEventListener('click', () => currentObj.increaseFood(2));
-    const cleanButton = document.querySelector('#plusClean');
-    cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
-    const sleepButton = document.querySelector('#plusSleep');
-    sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
-    const starveButton = document.querySelector('#subFood');
-    starveButton.addEventListener('click', () => currentObj.reduceFood());
-    const dirtyButton = document.querySelector('#subClean');
-    dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
-    const tireButton = document.querySelector('#subSleep');
-    tireButton.addEventListener('click', () => currentObj.reduceSleep());
+    // const feedButton = document.querySelector('#plusFood');
+    // feedButton.addEventListener('click', () => currentObj.increaseFood(2));
+    // const cleanButton = document.querySelector('#plusClean');
+    // cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
+    // const sleepButton = document.querySelector('#plusSleep');
+    // sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
+    // const starveButton = document.querySelector('#subFood');
+    // starveButton.addEventListener('click', () => currentObj.reduceFood());
+    // const dirtyButton = document.querySelector('#subClean');
+    // dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
+    // const tireButton = document.querySelector('#subSleep');
+    // tireButton.addEventListener('click', () => currentObj.reduceSleep());
 
     const newBugButton = document.querySelector('#newBug');
     newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
@@ -544,12 +537,12 @@ window.addEventListener('load', () => {
 
     document.querySelector('#startHarvest').addEventListener('click', harvestSelecting);
     document.querySelector('#startConstruction').addEventListener('click', buildingSelecting);
+    document.querySelector('#cancelCurrentActivity').addEventListener('click', cancelActivity);
+
     document.querySelector('#cancelActivity').addEventListener('click', cancelActivity);
 
     document.querySelector('#findDen').addEventListener('click', findClosestDen);
     document.querySelector('#findFood').addEventListener('click', findClosestFood);
-
-    const canvas = document.getElementById('canvas1');
 
     document.querySelector('#tenant_1').addEventListener('click', () => removeTenantButton(0));
     document.querySelector('#tenant_2').addEventListener('click', () => removeTenantButton(1));
@@ -559,6 +552,8 @@ window.addEventListener('load', () => {
 
     document.querySelector('#buildADen').addEventListener('click', () => placeNewBuilding('den'));
     document.querySelector('#buildAStorage').addEventListener('click', () => placeNewBuilding('storage'));
+
+    const canvas = document.getElementById('canvas1');
 
     canvas.addEventListener('mousemove', (e) => calculateMousePos(e)); // Doubt this'll work as intended. Will need somekind of setTimeout or running in the updateAll function. If so, then may not be possible to use event listeners.
     canvas.addEventListener('mouseup', mouseUp);
