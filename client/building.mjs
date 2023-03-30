@@ -60,6 +60,7 @@ export class FoodStorageBuilding extends Building {
 
 
     this.foodInventory = 0;
+    this.foodMax = 500;
 
     this.name = 'food storage';
     this.image = this.imageStages[0];

@@ -271,9 +271,13 @@ export class Bug {
   }
 
   depositFood(amount) {
-    this.storeTarget.increaseFood(amount);
-    this.foodInventory -= amount;
-    this.behaviour = 'harvesting';
+    if (this.storeTarget.foodInventory >= this.storeTarget.foodMax) {
+      this.behaviour = 'wandering';
+    } else {
+      this.storeTarget.increaseFood(amount);
+      this.foodInventory -= amount;
+      this.behaviour = 'harvesting';
+    }
   }
 
   cancelActivity() {

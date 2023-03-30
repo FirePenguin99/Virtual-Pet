@@ -43,16 +43,12 @@ window.addEventListener('load', () => {
     ctx.canvas.width = document.querySelector('html').clientWidth;
 
 
-    // if holding down mouse
     if (mouseHold) {
-      // if currently trying to place building
       if (isPlacingBuilding) {
         buildingTemplate.moveAcceptCancelButtons(visualOffset);
         if (isTemplateSelected) {
-          // move it to the mouse position
           buildingTemplate.moveToCursor(canvasMousePos, visualOffset);
         } else {
-          // Calculates visual offset for map movement. Must be calculated before everything is drawn as to avoid a frames worth of delay.
           moveMap();
         }
       } else {
@@ -62,23 +58,19 @@ window.addEventListener('load', () => {
     }
 
     // ---- For clearing and redrawing the objects in the scene, as well as bug behaviour  ----
-    // clears the entire canvas element
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // grey void behind the map image
     ctx.fillStyle = '#808080';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    // draw map image
     mapObject.draw(ctx, visualOffset);
 
     selectEntity.drawSelectedObject(currentObj, ctx, visualOffset);
 
     // Loop through array containing all Bugs, and call their draw() method and behaviour logic.
     for (const bug of bugsList) {
-      // draw each bug
       bug.draw(ctx, visualOffset);
-      // logic for each bug's behaviour
       bug.runBehaviourLogic(deltaTime);
     }
     // Loop through array containing all Entities, and call their draw() method.
@@ -93,7 +85,6 @@ window.addEventListener('load', () => {
 
     UpdateStatDisplays();
 
-    // call the function again
     requestAnimationFrame(updateFrame);
   }
 
@@ -263,7 +254,6 @@ window.addEventListener('load', () => {
     }
   }
   function harvestLogic() {
-    // if the first selected object is a food entity,
     if (selectedForActivity[0] instanceof FoodEntity) {
       document.querySelector('#building_1_Name').textContent = selectedForActivity[0].name;
       document.querySelector('#activityAlert').textContent = 'Select the food storage building for food to be deposited into';
@@ -273,8 +263,7 @@ window.addEventListener('load', () => {
       document.querySelector('#activityAlert').textContent = 'Select the food source target';
       return;
     }
-    // if the second selected object is a food storage,
-    if (selectedForActivity[1] instanceof FoodStorageBuilding) {
+    if (selectedForActivity[1] instanceof FoodStorageBuilding && !(selectedForActivity[1].underConstruction)) {
       document.querySelector('#building_2_Name').textContent = selectedForActivity[1].name;
       toggleHarvestSelecting = false;
       currentObj.setBehaviour('harvesting', selectedForActivity[0], selectedForActivity[1]);
@@ -336,8 +325,7 @@ window.addEventListener('load', () => {
       let closestDenObj = null;
       // Loop through array containing all buildings
       for (const building of entityList) {
-        // check if the building is a Den and that it is not full
-        if (building instanceof SleepingDenBuilding && building.occupancy !== building.maxOccupancy) {
+        if (building instanceof SleepingDenBuilding && building.occupancy !== building.maxOccupancy && !(building.underConstruction)) {
           const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
           if (closestDenValue === null || distanceFromDen < closestDenValue) {
             closestDenValue = distanceFromDen;
@@ -364,8 +352,7 @@ window.addEventListener('load', () => {
       let closestFoodObj = null;
       // Loop through array containing all buildings
       for (const building of entityList) {
-        // check if the building is a Food Storage and not empty
-        if (building instanceof FoodStorageBuilding && building.foodInventory > 0) {
+        if (building instanceof FoodStorageBuilding && building.foodInventory > 0 && !(building.underConstruction)) {
           const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
           if (closestFoodValue === null || distanceFromDen < closestFoodValue) {
             closestFoodValue = distanceFromDen;
