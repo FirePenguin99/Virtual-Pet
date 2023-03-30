@@ -56,7 +56,7 @@ export class FoodEntity extends Entity {
       bottom: this.y + (this.height / 2),
     };
 
-    this.foodInventory = 100;
+    this.foodInventory = 5000;
 
     this.name = 'large leaf';
     this.image = document.querySelector('#food_resource_1');

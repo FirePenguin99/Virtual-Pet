@@ -168,7 +168,6 @@ window.addEventListener('load', () => {
           // if the currently selected object will be selected again, skip a loop so that the next object below it is selected instead.
           if (currentObj !== obj) {
             currentObj = obj;
-            // UpdateStatDisplays();
             return;
           }
         }
@@ -202,7 +201,8 @@ window.addEventListener('load', () => {
     if (oldPos == null) {
       oldPos = canvasMousePos;
     } else {
-      visualOffset.x += (canvasMousePos.x - oldPos.x); // calculates movement of the mouse between frames and adds them to a total offset
+      // calculates movement of the mouse between frames and adds them to a total offset
+      visualOffset.x += (canvasMousePos.x - oldPos.x);
       visualOffset.y += (canvasMousePos.y - oldPos.y);
       oldPos = canvasMousePos;
     }
@@ -220,7 +220,6 @@ window.addEventListener('load', () => {
 
     currentObj = bugsList[bugNumber];
     bugNumber = bugNumber + 1;
-    // UpdateStatDisplays();
   }
   function checkBugDeath(bugObj) {
     if (bugObj.food <= 0) {
@@ -237,7 +236,6 @@ window.addEventListener('load', () => {
     bugNumber += -1;
     if (currentObj === bugObj) {
       currentObj = null;
-      // UpdateStatDisplays();
     }
   }
   function deleteGrave(graveObj) {
@@ -246,26 +244,27 @@ window.addEventListener('load', () => {
     entityList.splice(graveIndex, 1);
     if (currentObj === graveObj) {
       currentObj = null;
-      // UpdateStatDisplays();
     }
   }
 
   function harvestSelecting() {
-    if (currentObj.behaviour !== 'harvesting') { // start harvesting
+    // start harvesting
+    if (currentObj.behaviour !== 'harvesting') {
       toggleHarvestSelecting = true;
 
       document.querySelector('#activityAlert').textContent = 'Click on building you want the bug to help build';
       document.querySelector('#building_1_Name').style.display = 'block';
       document.querySelector('#building_2_Name').style.display = 'block';
 
-      // UpdateStatDisplays();
-    } else { // cancel harvesting
+    // cancel harvesting
+    } else {
       currentObj.setBehaviour('wandering');
       document.querySelector('#startHarvest').textContent = 'Press to start harvesting';
     }
   }
   function harvestLogic() {
-    if (selectedForActivity[0] instanceof FoodEntity) { // if the first selected object is a food entity,
+    // if the first selected object is a food entity,
+    if (selectedForActivity[0] instanceof FoodEntity) {
       document.querySelector('#building_1_Name').textContent = selectedForActivity[0].name;
       document.querySelector('#activityAlert').textContent = 'Select the food storage building for food to be deposited into';
     } else {
@@ -274,12 +273,13 @@ window.addEventListener('load', () => {
       document.querySelector('#activityAlert').textContent = 'Select the food source target';
       return;
     }
-    if (selectedForActivity[1] instanceof FoodStorageBuilding) { // if the second selected object is a food storage,
+    // if the second selected object is a food storage,
+    if (selectedForActivity[1] instanceof FoodStorageBuilding) {
       document.querySelector('#building_2_Name').textContent = selectedForActivity[1].name;
       toggleHarvestSelecting = false;
       currentObj.setBehaviour('harvesting', selectedForActivity[0], selectedForActivity[1]);
-      selectedForActivity.splice(0, selectedForActivity.length); // clear entire array for reuse later
-      // UpdateStatDisplays();
+      // clear entire array for reuse later
+      selectedForActivity.splice(0, selectedForActivity.length);
     } else {
       selectedForActivity.splice(1, 1);
       document.querySelector('#building_2_Name').style.display = 'block';
@@ -289,15 +289,16 @@ window.addEventListener('load', () => {
   }
 
   function buildingSelecting() {
-    if (currentObj.behaviour !== 'building') { // start building
+    // start building
+    if (currentObj.behaviour !== 'building') {
       toggleBuildingSelecting = true;
 
       document.querySelector('#activityAlert').textContent = 'Click on building you want the bug to help build';
       document.querySelector('#building_1_Name').style.display = 'none';
       document.querySelector('#building_2_Name').style.display = 'none';
 
-      // UpdateStatDisplays();
-    } else { // cancel building
+    // cancel building
+    } else {
       currentObj.setBehaviour('wandering');
       document.querySelector('#startConstruction').textContent = 'Press to start construction';
     }
@@ -306,8 +307,6 @@ window.addEventListener('load', () => {
     if (selectedForActivity[0] instanceof Building) {
       currentObj.setBehaviour('building', selectedForActivity[0]);
       toggleBuildingSelecting = false;
-
-      // UpdateStatDisplays();
     } else {
       console.log('bruh');
     }
@@ -315,15 +314,15 @@ window.addEventListener('load', () => {
   function cancelActivity() {
     toggleBuildingSelecting = false;
     toggleHarvestSelecting = false;
-    selectedForActivity.splice(0, selectedForActivity.length); // clear array of already chosen entities
+    // clear array of already chosen entities
+    selectedForActivity.splice(0, selectedForActivity.length);
 
     currentObj.cancelActivity();
-
-    // UpdateStatDisplays();
   }
 
   function findClosestDen() {
-    if (currentObj.behaviour === 'sleeping') { // if already sleeping, then wake up
+    // if already sleeping, then wake up
+    if (currentObj.behaviour === 'sleeping') {
       currentObj.setBehaviour('wandering');
       document.querySelector('#findDen').textContent = 'Press to send the bug to the closest sleeping den';
       if (currentObj.isInDen) {
@@ -331,17 +330,18 @@ window.addEventListener('load', () => {
       } else {
         currentObj.setBehaviour('wandering');
       }
-    } else { // find closest den and set behaviour to moveToDen
+    // find closest den and set behaviour to moveToDen
+    } else {
       let closestDenValue = null;
       let closestDenObj = null;
-      for (const building of entityList) { // Loop through array containing all buildings
-        if (building instanceof SleepingDenBuilding && building.occupancy !== building.maxOccupancy) { // check if the building is a Den and that it is not full
+      // Loop through array containing all buildings
+      for (const building of entityList) {
+        // check if the building is a Den and that it is not full
+        if (building instanceof SleepingDenBuilding && building.occupancy !== building.maxOccupancy) {
           const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
-          // console.log(distanceFromDen);
           if (closestDenValue === null || distanceFromDen < closestDenValue) {
             closestDenValue = distanceFromDen;
             closestDenObj = building;
-            // console.log(closestDenObj);
           }
         }
       }
@@ -354,20 +354,22 @@ window.addEventListener('load', () => {
     }
   }
   function findClosestFood() {
-    if (currentObj.behaviour === 'feeding') { // if already eating, then wake up
+    // if already eating, then wake up
+    if (currentObj.behaviour === 'feeding') {
       currentObj.setBehaviour('wandering');
       document.querySelector('#findFood').textContent = 'Press to send the bug to the closest food source';
-    } else { // find closest food source and set behaviour to moveToFood
+    // find closest food source and set behaviour to moveToFood
+    } else {
       let closestFoodValue = null;
       let closestFoodObj = null;
-      for (const building of entityList) { // Loop through array containing all buildings
-        if (building instanceof FoodStorageBuilding && building.foodInventory > 0) { // check if the building is a Food Storage and not empty
+      // Loop through array containing all buildings
+      for (const building of entityList) {
+        // check if the building is a Food Storage and not empty
+        if (building instanceof FoodStorageBuilding && building.foodInventory > 0) {
           const distanceFromDen = Math.abs(Math.sqrt(Math.pow(currentObj.x - building.x, 2) + Math.pow(currentObj.y - building.y, 2)));
-          // console.log(distanceFromDen);
           if (closestFoodValue === null || distanceFromDen < closestFoodValue) {
             closestFoodValue = distanceFromDen;
             closestFoodObj = building;
-            // console.log(closestDenObj);
           }
         }
       }
@@ -421,18 +423,18 @@ window.addEventListener('load', () => {
     isPlacingBuilding = false;
   }
 
+  // update all the attribute displays to represent the selected pet
   function UpdateStatDisplays() {
-    // update all the attribute displays to represent the selected pet
-    const childOfDiv = document.querySelector('#UI').children; // Hide all child elements of the UI div
+    // Hide all child elements of the UI div
+    const childOfDiv = document.querySelector('#UI').children;
     for (let index = 0; index < childOfDiv.length; index++) {
       childOfDiv[index].classList.add('hidden');
-      if (childOfDiv[index].id === 'bugButtons') {
-        console.log('bugButtons hidden dumbass');
-      }
     }
 
-    if (currentObj === null) { // if nothing is selected,
-      return; // display nothing.
+    // if nothing is selected,
+    if (currentObj === null) {
+      // display nothing.
+      return;
     }
 
     if (toggleHarvestSelecting) {
@@ -448,21 +450,20 @@ window.addEventListener('load', () => {
     document.querySelector('#nameDisplay').classList.remove('hidden');
     document.querySelector('#nameDisplay').textContent = 'name: ' + currentObj.name;
 
-    if (currentObj instanceof Bug) { // Show and update only the relevent child elements
+    // Show and update only the relevent child elements
+    if (currentObj instanceof Bug) {
       document.querySelector('#foodDisplay').classList.remove('hidden');
       document.querySelector('#bugStats').classList.remove('hidden');
 
-      document.querySelector('#foodDisplay').textContent = 'food: ' + currentObj.food;
+      document.querySelector('#foodDisplay').textContent = 'food: ' + Math.trunc(currentObj.food);
       document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
       document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentObj.sleep;
-      document.querySelector('#happinessDisplay').textContent = 'happiness: ' + currentObj.happiness;
+      document.querySelector('#happinessDisplay').textContent = 'happiness: ' + Math.trunc((currentObj.food + currentObj.cleanliness + currentObj.sleep) / 3);
 
       if (currentObj.behaviour === 'wandering') {
         document.querySelector('#bugButtons').classList.remove('hidden');
-        console.log('not up to much');
       } else {
         document.querySelector('#cancelCurrentActivity').classList.remove('hidden');
-        console.log('doin something man');
       }
 
       if (currentObj instanceof Queen) {
@@ -504,16 +505,12 @@ window.addEventListener('load', () => {
         bug.reduceFood();
         bug.reduceSleep();
         bug.reduceCleanliness();
-        bug.calculateHappiness();
       }
 
 
       checkBugDeath(bug);
     }
     setTimeout(decreaseStatsInterval, 5000);
-
-    // update all the attribute displays to represent the selected pet
-    // UpdateStatDisplays();
   }
 
   // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
@@ -568,6 +565,5 @@ window.addEventListener('load', () => {
   function removeTenantButton(i) {
     console.log(currentObj.tenants[i]);
     currentObj.removeTenant(currentObj.tenants[i]);
-    // UpdateStatDisplays();
   }
 });
