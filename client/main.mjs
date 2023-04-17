@@ -221,9 +221,9 @@ window.addEventListener('load', () => {
     if (bugObj.sleep <= 25) {
       bugObj.debuffList.push(document.querySelector('#tired_sprite'));
     }
-    // if (bugObj.cleanliness <= 25) {
-    //   bugObj.debuffList.push(document.querySelector('#unclean_sprite'));
-    // }
+    if (bugObj.cleanliness <= 25) {
+      bugObj.debuffList.push(document.querySelector('#dirty_sprite'));
+    }
 
     if (bugObj.food <= 0) {
       bugDeath(bugObj, 'food');

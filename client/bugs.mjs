@@ -89,10 +89,10 @@ export class Bug {
 
   drawDebuffs(context, offset) {
     // debuffScaler calculates the amount left (x) the debuffs will need to start.
-    const debuffScaler = -1 * (0.5 * this.debuffList.length) - 0.5;
+    const debuffScaler = ((0.5 * this.debuffList.length)) - 0.5;
     for (let i = 0; i < this.debuffList.length; i++) {
       // debuffs start being placed at the debuffScaler, then add by 1 every next debuff. The '* 20' is the amount scaled up to be the correct amount of pixels.
-      context.drawImage(this.debuffList[i], this.x + offset.x - ((debuffScaler + i) * 20) - 10, this.y + offset.y - (this.height) - 10);
+      context.drawImage(this.debuffList[i], this.x + offset.x - ((-1 * debuffScaler + i) * 20) - 10, this.y + offset.y - (this.height) - 10);
     }
   }
 
