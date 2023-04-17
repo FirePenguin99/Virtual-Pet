@@ -4,9 +4,9 @@ export class Bug {
 
     this.name = name;
     this.type = type;
-    this.food = 100;
-    this.sleep = 100;
-    this.cleanliness = 100;
+    this.food = 30;
+    this.sleep = 30;
+    this.cleanliness = 30;
     this.happiness = 100;
 
     this.x = spawnX;
@@ -15,6 +15,9 @@ export class Bug {
     this.width = 20;
     this.height = 20;
     this.image = image;
+
+    this.debuffList = [];
+
 
     this.bounds = {
       left: this.x - (this.width / 2),
@@ -80,7 +83,17 @@ export class Bug {
 
 
   draw(context, offset) {
-    context.drawImage(this.image, this.x + offset.x - (this.width / 2), this.y + offset.y - (this.height / 2), this.width, this.height); // Adds actual position with visual offset from moving the camera/map. Subtracting the half height and width makes the x and y coords of the bug represent it's center, rather than top left edge.
+    context.drawImage(this.image, this.x + offset.x - (this.width / 2), this.y + offset.y - (this.height / 2)); // Adds actual position with visual offset from moving the camera/map. Subtracting the half height and width makes the x and y coords of the bug represent it's center, rather than top left edge.
+    this.drawDebuffs(context, offset);
+  }
+
+  drawDebuffs(context, offset) {
+    // debuffScaler calculates the amount left (x) the debuffs will need to start.
+    const debuffScaler = -1 * (0.5 * this.debuffList.length) - 0.5;
+    for (let i = 0; i < this.debuffList.length; i++) {
+      // debuffs start being placed at the debuffScaler, then add by 1 every next debuff. The '* 20' is the amount scaled up to be the correct amount of pixels.
+      context.drawImage(this.debuffList[i], this.x + offset.x - ((debuffScaler + i) * 20) - 10, this.y + offset.y - (this.height) - 10);
+    }
   }
 
   recalculateBounds() {

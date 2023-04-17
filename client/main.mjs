@@ -213,6 +213,18 @@ window.addEventListener('load', () => {
     bugNumber = bugNumber + 1;
   }
   function checkBugDeath(bugObj) {
+    bugObj.debuffList.splice(0, bugObj.debuffList.length);
+
+    if (bugObj.food <= 25) {
+      bugObj.debuffList.push(document.querySelector('#hungry_sprite'));
+    }
+    if (bugObj.sleep <= 25) {
+      bugObj.debuffList.push(document.querySelector('#tired_sprite'));
+    }
+    // if (bugObj.cleanliness <= 25) {
+    //   bugObj.debuffList.push(document.querySelector('#unclean_sprite'));
+    // }
+
     if (bugObj.food <= 0) {
       bugDeath(bugObj, 'food');
     } else if (bugObj.cleanliness <= 0) {
@@ -502,18 +514,18 @@ window.addEventListener('load', () => {
 
   // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
   function addListeners() {
-    // const feedButton = document.querySelector('#plusFood');
-    // feedButton.addEventListener('click', () => currentObj.increaseFood(2));
-    // const cleanButton = document.querySelector('#plusClean');
-    // cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
-    // const sleepButton = document.querySelector('#plusSleep');
-    // sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
-    // const starveButton = document.querySelector('#subFood');
-    // starveButton.addEventListener('click', () => currentObj.reduceFood());
-    // const dirtyButton = document.querySelector('#subClean');
-    // dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
-    // const tireButton = document.querySelector('#subSleep');
-    // tireButton.addEventListener('click', () => currentObj.reduceSleep());
+    const feedButton = document.querySelector('#plusFood');
+    feedButton.addEventListener('click', () => currentObj.increaseFood(2));
+    const cleanButton = document.querySelector('#plusClean');
+    cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
+    const sleepButton = document.querySelector('#plusSleep');
+    sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
+    const starveButton = document.querySelector('#subFood');
+    starveButton.addEventListener('click', () => currentObj.reduceFood());
+    const dirtyButton = document.querySelector('#subClean');
+    dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
+    const tireButton = document.querySelector('#subSleep');
+    tireButton.addEventListener('click', () => currentObj.reduceSleep());
 
     const newBugButton = document.querySelector('#newBug');
     newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
