@@ -1,3 +1,5 @@
+import { entityList, corpseList } from './main.mjs';
+
 export class Entity {
   constructor(name, spawnX, spawnY, width, height, image) {
     this.name = name;
@@ -204,6 +206,45 @@ export class TemplateBuildingEntity extends Entity {
         this.canPlace = true;
       }
       // console.log(this.canPlace);
+    }
+  }
+}
+
+export class CorpseEntity extends Entity {
+  constructor(bugObj, cause) {
+    super(bugObj, cause);
+    this.ownerBug = bugObj;
+    this.cause = cause;
+    this.x = this.ownerBug.x;
+    this.y = this.ownerBug.y;
+
+    this.name = this.ownerBug.name + "'s corpse";
+
+    this.height = 20;
+    this.width = 20;
+
+    this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
+      left: this.x - (this.width / 2),
+      right: this.x + (this.width / 2),
+      top: this.y - (this.height / 2),
+      bottom: this.y + (this.height / 2),
+    };
+
+    this.cleaningProgress = 0;
+
+    console.log(corpseList);
+
+    this.image = document.querySelector('#worker_sprite');
+  }
+
+  cleanCorpse(amount) {
+    this.cleaningProgress += amount;
+
+    if (this.cleaningProgress > 5) {
+      const corpseIndex = corpseList.indexOf(this);
+      corpseList.splice(corpseIndex, 1);
+
+      entityList.push(new GravestoneEntity(this.ownerBug, this.cause));
     }
   }
 }
