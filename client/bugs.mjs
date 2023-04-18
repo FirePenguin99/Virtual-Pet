@@ -189,24 +189,30 @@ export class Bug {
   }
 
   runBehaviourLogic(deltaTime) {
-    if (this.behaviour === 'wandering') {
-      this.wanderingBehaviour(deltaTime);
-    } else if (this.behaviour === 'harvesting') { // if harvesting then set its movement target to the coords of the harvest target
-      this.moveToBehaviour(this.harvestTarget);
-    } else if (this.behaviour === 'storing') { // if storing then set its movement target to the coords of the storing target
-      this.moveToBehaviour(this.storeTarget);
-    } else if (this.behaviour === 'sleeping') {
-      this.sleepingBehaviour(deltaTime);
-    } else if (this.behaviour === 'moveToDen') {
-      this.moveToBehaviour(this.entityTarget);
-    } else if (this.behaviour === 'moveToBuilding') {
-      this.moveToBehaviour(this.entityTarget);
-    } else if (this.behaviour === 'building') {
-      this.startBuilding(deltaTime);
-    } else if (this.behaviour === 'moveToFood') {
-      this.moveToBehaviour(this.entityTarget);
-    } else if (this.behaviour === 'feeding') {
-      this.startFeeding(deltaTime);
+    switch (this.behaviour) {
+      case 'wandering':
+        this.wanderingBehaviour(deltaTime);
+        break;
+      case 'feeding':
+        this.startFeeding(deltaTime);
+        break;
+      case 'building':
+        this.startBuilding(deltaTime);
+        break;
+      case 'harvesting':
+        this.moveToBehaviour(this.harvestTarget);
+        break;
+      case 'storing':
+        this.moveToBehaviour(this.storeTarget);
+        break;
+      case 'sleeping':
+        this.sleepingBehaviour(deltaTime);
+        break;
+      case 'moveToDen':
+      case 'moveToBuilding':
+      case 'moveToFood':
+        this.moveToBehaviour(this.entityTarget);
+        break;
     }
 
     if (this.movingState === 'moving') {
