@@ -497,6 +497,8 @@ function UpdateStatDisplays() {
 }
 // loops through array of bug objects then reduces each of their stats, on a timer of 5 seconds.
 function decreaseStatsInterval() {
+  const cleanlinessAmount = 4 - corpseList.length * 2;
+
   for (const bug of bugsList) {
     if (bug.sleep <= 0 || bug.behaviour === 'sleeping') {
       bug.setBehaviour('sleeping');
@@ -508,7 +510,7 @@ function decreaseStatsInterval() {
     } else {
       bug.reduceFood();
       bug.reduceSleep();
-      bug.reduceCleanliness();
+      bug.increaseCleanliness(cleanlinessAmount);
     }
 
 
