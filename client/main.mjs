@@ -12,23 +12,14 @@ export const corpseList = [];
 const selectEntity = new SelectionEntity();
 
 createNewBug('goob', 'queen');
-createNewBug('dude', 'worker');
-createNewBug('the dude', 'worker');
-createNewBug('dudest', 'worker');
-createNewBug('duderino', 'worker');
-createNewBug('the dudester', 'worker');
-createNewBug('dudeman', 'worker');
 
 createNewEntity('selection');
 console.log(entityList);
 
-createNewEntity('food');
-createNewBuilding('food_storage', 1000, 400);
+createNewEntity('food', 1000, 1000);
+createNewEntity('food', -1000, -1000);
+createNewEntity('food', 200, 0);
 
-createNewBuilding('sleeping_den', 0, 0);
-
-createNewBuilding('sleeping_den', 100, 100);
-createNewBuilding('sleeping_den', 300, 300);
 
 addListeners();
 
@@ -38,7 +29,7 @@ const ctx = canvas.getContext('2d');
 
 // variables for the background image and entity
 const mapImage = document.querySelector('#map');
-const mapObject = new Entity('map', 1000, 500, 3000, 3000, mapImage);
+const mapObject = new Entity('map', 0, 0, 5000, 5000, mapImage);
 
 // variables for setting bug's behaviour to an activity (either Harvesting or Building)
 let toggleActivitySelecting = false;
@@ -390,18 +381,18 @@ function findClosestFood() {
 }
 
 
-function createNewEntity(newEntityType) {
+function createNewEntity(newEntityType, spawnX, spawnY) {
   if (newEntityType === 'food') {
-    entityList.push(new FoodEntity(1000, 1000));
+    entityList.push(new FoodEntity(spawnX, spawnY));
   }
 }
-function createNewBuilding(newBuildingType, spawnX, spawnY) {
-  if (newBuildingType === 'food_storage') {
-    entityList.push(new FoodStorageBuilding(spawnX, spawnY));
-  } else if (newBuildingType === 'sleeping_den') {
-    entityList.push(new SleepingDenBuilding(spawnX, spawnY));
-  }
-}
+// function createNewBuilding(newBuildingType, spawnX, spawnY) {
+//   if (newBuildingType === 'food_storage') {
+//     entityList.push(new FoodStorageBuilding(spawnX, spawnY));
+//   } else if (newBuildingType === 'sleeping_den') {
+//     entityList.push(new SleepingDenBuilding(spawnX, spawnY));
+//   }
+// }
 
 function placeNewBuilding(newBuildingType) {
   if (newBuildingType === 'den') {
@@ -521,18 +512,18 @@ function decreaseStatsInterval() {
 
 // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
 function addListeners() {
-  const feedButton = document.querySelector('#plusFood');
-  feedButton.addEventListener('click', () => currentObj.increaseFood(2));
-  const cleanButton = document.querySelector('#plusClean');
-  cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
-  const sleepButton = document.querySelector('#plusSleep');
-  sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
-  const starveButton = document.querySelector('#subFood');
-  starveButton.addEventListener('click', () => currentObj.reduceFood());
-  const dirtyButton = document.querySelector('#subClean');
-  dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
-  const tireButton = document.querySelector('#subSleep');
-  tireButton.addEventListener('click', () => currentObj.reduceSleep());
+  // const feedButton = document.querySelector('#plusFood');
+  // feedButton.addEventListener('click', () => currentObj.increaseFood(2));
+  // const cleanButton = document.querySelector('#plusClean');
+  // cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
+  // const sleepButton = document.querySelector('#plusSleep');
+  // sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
+  // const starveButton = document.querySelector('#subFood');
+  // starveButton.addEventListener('click', () => currentObj.reduceFood());
+  // const dirtyButton = document.querySelector('#subClean');
+  // dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
+  // const tireButton = document.querySelector('#subSleep');
+  // tireButton.addEventListener('click', () => currentObj.reduceSleep());
 
   const newBugButton = document.querySelector('#newBug');
   newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
