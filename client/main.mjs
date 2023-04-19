@@ -11,14 +11,14 @@ export const corpseList = [];
 
 const selectEntity = new SelectionEntity();
 
-createNewBug('goob', 'queen');
 
 createNewEntity('selection');
 console.log(entityList);
 
-createNewEntity('food', 1000, 1000);
-createNewEntity('food', -1000, -1000);
-createNewEntity('food', 200, 0);
+createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
 
 
 addListeners();
@@ -26,6 +26,8 @@ addListeners();
 // Variables for initialising canvas in js
 const canvas = document.querySelector('#canvas1');
 const ctx = canvas.getContext('2d');
+ctx.canvas.height = document.querySelector('html').clientHeight;
+ctx.canvas.width = document.querySelector('html').clientWidth;
 
 // variables for the background image and entity
 const mapImage = document.querySelector('#map');
@@ -45,12 +47,16 @@ let isTemplateSelected = false;
 // Variables for mouse movement and map movement
 let mouseHold = false;
 let canvasMousePos = { x: null, y: null };
-const visualOffset = { x: 0, y: 0 };
+// setting the x and y to half the canvas' height and width makes it so the "camera" starts with (0, 0) in the game world, being in the middle of the screen
+const visualOffset = { x: (ctx.canvas.width / 2), y: (ctx.canvas.height / 2) };
 let oldPos = null;
 
 // initialising previousTimeStamp for use in updateFrame()
 let previousTimeStamp = 0;
 const fpsCounter = document.querySelector('#fpsCounter');
+
+createNewBug('goob', 'queen', 0, 0);
+createNewBuilding('food_storage', 0, 100);
 
 // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
 function updateFrame(timeStamp) {
@@ -200,15 +206,28 @@ function moveMap() {
   }
 }
 
-function createNewBug(newBugName, newBugType) {
+function createNewBug(newBugName, newBugType, x, y) {
   // create object
   if (newBugType === 'queen') {
-    bugsList.push(new Queen(newBugName, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800))));
+    bugsList.push(new Queen(newBugName, x, y));
   } else if (newBugType === 'worker') {
-    bugsList.push(new Worker(newBugName, (Math.floor(Math.random() * 1000)), (Math.floor(Math.random() * 800))));
+    bugsList.push(new Worker(newBugName, x, y));
   }
 
   console.log(bugsList);
+
+  currentObj = bugsList[bugNumber];
+  bugNumber = bugNumber + 1;
+}
+function spawnNewBug(newBugName) {
+  if (bugsList[0].food < 50) {
+    return;
+  }
+  bugsList.push(new Worker(newBugName, (Math.random() * 100) - 50 + bugsList[0].x, (Math.random() * 100) - 50 + bugsList[0].y));
+
+  console.log(bugsList);
+
+  bugsList[0].food -= 45;
 
   currentObj = bugsList[bugNumber];
   bugNumber = bugNumber + 1;
@@ -386,20 +405,21 @@ function createNewEntity(newEntityType, spawnX, spawnY) {
     entityList.push(new FoodEntity(spawnX, spawnY));
   }
 }
-// function createNewBuilding(newBuildingType, spawnX, spawnY) {
-//   if (newBuildingType === 'food_storage') {
-//     entityList.push(new FoodStorageBuilding(spawnX, spawnY));
-//   } else if (newBuildingType === 'sleeping_den') {
-//     entityList.push(new SleepingDenBuilding(spawnX, spawnY));
-//   }
-// }
+function createNewBuilding(newBuildingType, spawnX, spawnY) {
+  if (newBuildingType === 'food_storage') {
+    entityList.push(new FoodStorageBuilding(spawnX, spawnY));
+  } else if (newBuildingType === 'sleeping_den') {
+    entityList.push(new SleepingDenBuilding(spawnX, spawnY));
+  }
+}
 
 function placeNewBuilding(newBuildingType) {
   if (newBuildingType === 'den') {
-    buildingTemplate = (new TemplateBuildingEntity('denTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 100, document.querySelector('#sleeping_den_sprite'), visualOffset));
+    buildingTemplate = (new TemplateBuildingEntity('denTemplate', (ctx.canvas.width / 2) - visualOffset.x, (ctx.canvas.height / 2) - visualOffset.y, 150, 100, document.querySelector('#sleeping_den_sprite'), visualOffset));
+    console.log(buildingTemplate);
     isPlacingBuilding = true;
   } else if (newBuildingType === 'storage') {
-    buildingTemplate = (new TemplateBuildingEntity('storageTemplate', ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, document.querySelector('#food_storage_sprite'), visualOffset));
+    buildingTemplate = (new TemplateBuildingEntity('storageTemplate', (ctx.canvas.width / 2) - visualOffset.x, (ctx.canvas.height / 2) - visualOffset.y, 150, 150, document.querySelector('#food_storage_sprite'), visualOffset));
     isPlacingBuilding = true;
   }
 }
@@ -454,6 +474,7 @@ function UpdateStatDisplays() {
     document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
     document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentObj.sleep;
     document.querySelector('#happinessDisplay').textContent = 'happiness: ' + Math.trunc((currentObj.food + currentObj.cleanliness + currentObj.sleep) / 3);
+    document.querySelector('#currentBehaviour').textContent = 'current behaviour: ' + currentObj.behaviour;
 
     if (currentObj.behaviour === 'wandering') {
       document.querySelector('#bugButtons').classList.remove('hidden');
@@ -466,7 +487,7 @@ function UpdateStatDisplays() {
     }
   } else if (currentObj instanceof FoodEntity || currentObj instanceof FoodStorageBuilding) {
     document.querySelector('#foodDisplay').classList.remove('hidden');
-    document.querySelector('#foodDisplay').textContent = 'food stored: ' + currentObj.foodInventory;
+    document.querySelector('#foodDisplay').textContent = 'food stored: ' + Math.trunc(currentObj.foodInventory);
   } else if (currentObj instanceof GravestoneEntity) {
     document.querySelector('#graveElems').classList.remove('hidden');
     document.querySelector('#birthdayDisplay').textContent = 'date of birth: ' + currentObj.bugBirthday.getDate() + '/' + (currentObj.bugBirthday.getMonth() + 1) + '/' + currentObj.bugBirthday.getFullYear();
@@ -526,7 +547,7 @@ function addListeners() {
   // tireButton.addEventListener('click', () => currentObj.reduceSleep());
 
   const newBugButton = document.querySelector('#newBug');
-  newBugButton.addEventListener('click', () => createNewBug(prompt("Insert new bug's Name", ''), 'worker'));
+  newBugButton.addEventListener('click', () => spawnNewBug(prompt("Insert new bug's Name", '')));
 
   const deleteGraveButton = document.querySelector('#deleteGrave');
   deleteGraveButton.addEventListener('click', () => deleteGrave(currentObj));

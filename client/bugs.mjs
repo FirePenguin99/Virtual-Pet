@@ -4,10 +4,9 @@ export class Bug {
 
     this.name = name;
     this.type = type;
-    this.food = 30;
-    this.sleep = 30;
-    this.cleanliness = 30;
-    this.happiness = 100;
+    this.food = 100;
+    this.sleep = 100;
+    this.cleanliness = 100;
 
     this.x = spawnX;
     this.y = spawnY;
@@ -107,8 +106,8 @@ export class Bug {
 
 
   calculateSpeed() {
-    if (this.sleep > 80) {
-      return 4;
+    if (this.sleep > 60) {
+      return 5;
     } else if (this.sleep < 20) {
       return 1;
     } else {
