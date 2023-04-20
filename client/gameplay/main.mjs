@@ -37,11 +37,11 @@ let previousTimeStamp = 0;
 const fpsCounter = document.querySelector('#fpsCounter');
 
 let currentObj;
-export const bugsList = [];
-export const entityList = [];
+export let bugsList = [];
+export let entityList = [];
 let bugNumber = 0;
 
-export const corpseList = [];
+export let corpseList = [];
 
 const selectEntity = new SelectionEntity();
 
@@ -586,8 +586,22 @@ function startNewGame() {
   localStorage.setItem('newOrLoad', null);
 }
 
+function loadGame(hiveObj) {
+  const hive = JSON.parse(hiveObj);
+  currentObj = hive.currentObj;
+  bugsList = hive.bugsList;
+  entityList = hive.entityList;
+  bugNumber = hive.bugNumber;
+
+  corpseList = hive.corpseList;
+
+  console.log(hive.currentObj);
+}
+
 if (localStorage.getItem('newOrLoad') === 'new') {
   startNewGame();
+} else if (localStorage.getItem('newOrLoad') === 'load') {
+  loadGame(localStorage.getItem('loadedHive'));
 }
 
 addListeners();

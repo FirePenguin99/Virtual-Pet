@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Virtual Pet Homepage</title>
-<!-- <script type='module' src="main.mjs" defer></script>
-<link rel="stylesheet" href="index_style.css"> -->
+<script defer src="index.js" defer></script>
+<!-- <link rel="stylesheet" href="index_style.css"> -->
 
 <h1>Welcome to Gabriel's Virtual Pet Homepage!</h1>
 <p>please pick what mode you want to start</p>
@@ -11,7 +11,8 @@
 <a id="loadGame" href='/gameplay/index.html'>Load Game</a>
 <button>Spectate</button>
 
-<script>
-    document.querySelector('#newGame').addEventListener('click', () => localStorage.setItem('newOrLoad', 'new'));
-    document.querySelector('#loadGame').addEventListener('click', () => localStorage.setItem('newOrLoad', 'load'));
-</script>
+<ul id="hiveList">  Hives:  
+    <li>
+        <button> Hive Name: Thing go here </button>
+    </li>
+</ul>
