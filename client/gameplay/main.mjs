@@ -2,27 +2,8 @@ import { Worker, Queen, Bug } from './bugs.mjs';
 import { Entity, FoodEntity, CorpseEntity, GravestoneEntity, SelectionEntity, TemplateBuildingEntity } from './entity.mjs';
 import { Building, FoodStorageBuilding, SleepingDenBuilding } from './building.mjs';
 
-let currentObj;
-export const bugsList = [];
-export const entityList = [];
-let bugNumber = 0;
-
-export const corpseList = [];
-
-const selectEntity = new SelectionEntity();
-
-
-createNewEntity('selection');
-console.log(entityList);
-
-createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
-createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
-createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
-createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
-
-
-addListeners();
-
+console.log(localStorage);
+// GLOBAL VARIABLES
 // Variables for initialising canvas in js
 const canvas = document.querySelector('#canvas1');
 const ctx = canvas.getContext('2d');
@@ -55,8 +36,14 @@ let oldPos = null;
 let previousTimeStamp = 0;
 const fpsCounter = document.querySelector('#fpsCounter');
 
-createNewBug('goob', 'queen', 0, 0);
-createNewBuilding('food_storage', 0, 100);
+let currentObj;
+export const bugsList = [];
+export const entityList = [];
+let bugNumber = 0;
+
+export const corpseList = [];
+
+const selectEntity = new SelectionEntity();
 
 // function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
 function updateFrame(timeStamp) {
@@ -120,9 +107,6 @@ function updateFrame(timeStamp) {
 
   requestAnimationFrame(updateFrame);
 }
-
-updateFrame();
-decreaseStatsInterval();
 
 // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
 function selectObject() {
@@ -588,3 +572,24 @@ function removeTenantButton(i) {
   console.log(currentObj.tenants[i]);
   currentObj.removeTenant(currentObj.tenants[i]);
 }
+
+
+function startNewGame() {
+  createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+  createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+  createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+  createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
+
+  createNewBug(prompt("Insert new Queen's name", ''), 'queen', 0, 0);
+  createNewBuilding('food_storage', 0, 100);
+
+  localStorage.setItem('newOrLoad', null);
+}
+
+if (localStorage.getItem('newOrLoad') === 'new') {
+  startNewGame();
+}
+
+addListeners();
+updateFrame();
+decreaseStatsInterval();

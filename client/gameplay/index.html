@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Virtual Pet</title>
+<script type='module' src="main.mjs" defer></script>
+<link rel="stylesheet" href="gameplay_style.css">
+
+
+<section id="pet">
+    <canvas id="canvas1" width="1200" height = "800"></canvas>
+    
+    <section id="UI">
+        <p id="nameDisplay"> name: </p>
+        <p id="foodDisplay"> food: </p>
+        
+        <aside id="bugStats">
+            <p id="cleanlinessDisplay"> cleanliness: </p>
+            <p id="sleepDisplay"> energy: </p>
+            <p id="happinessDisplay"> happiness: </p>
+            <p id="currentBehaviour"> current behaviour: </p>
+        </aside>
+        
+        <button id="newBug"> Press to create new Bug (Costs 50 food) </button>
+        
+        <aside id="bugButtons">
+            <!-- <button id="plusFood"> Press to feed </button>
+            <button id="plusClean"> Press to clean </button>
+            <button id="plusSleep"> Press to put to sleep </button>
+            <button id="subFood"> Press to starve </button>
+            <button id="subClean"> Press to make dirty </button>
+            <button id="subSleep"> Press to tire </button> -->
+
+            <button id="findFood"> Press to find closest Food source</button>
+            <button id="startHarvest"> Press to start harvesting </button>
+            <button id="findDen"> Press to send the bug to the closest sleeping den </button>
+            <button id="startConstruction"> Press to aid in Construction </button>
+            <button id="cleanCorpse"> Press to clean a corpse </button>
+        </aside>
+        <button id="cancelCurrentActivity"> Press to stop behaviour </button>
+
+        <aside id="graveElems">
+            <p id="birthdayDisplay"> date of birth: </p>
+            <p id="deathdayDisplay"> date of death: </p>
+            <p id="timeAliveDisplay"> time survived: </p>
+            <p id="causeDisplay"> cause of death: </p>
+            <button id="deleteGrave"> Press to clean away grave </button>
+        </aside>
+
+        <aside id="activityElems">
+            <p id="activityAlert"> Select the food source target </p>
+            <p id="activityBugName"> -- </p>
+            <p id="building_1_Name"> -- </p>
+            <p id="building_2_Name"> -- </p>
+            <button id="cancelActivity"> Press to cancel current activity </button>
+        </aside>
+
+        <aside id="denElems">
+            <p id="occupancy"> occupancy: </p>
+            <section id="tenantButtons">
+                <button id="tenant_1"> Press to wake up: </button>
+                <button id="tenant_2"> Press to wake up: </button>
+                <button id="tenant_3"> Press to wake up: </button>
+                <button id="tenant_4"> Press to wake up: </button>
+                <button id="tenant_5"> Press to wake up: </button>
+            </section>
+        </aside>
+    </section>
+</section>
+
+<div id="buildingWindow">
+    <button id="buildADen"> build a den </button>
+    <button id="buildAStorage"> build a storage </button>
+</div>
+
+<div id="acceptAndCancel" class="hidden">
+    <button id="accept"> Accept </button>
+    <button id="cancel"> Cancel </button>
+</div>
+
+<img id="map" src = "sprites/mapImage_3.png">
+<img id="queen_sprite" src = "sprites/queen_sprite.png">
+<img id="worker_sprite" src = "sprites/worker_sprite.png">
+<img id="food_resource_1" src = "sprites/leaf_sprite.png">
+<img id="gravestone_sprite" src = "sprites/gravestone_sprite.png">
+
+<img id="food_storage_sprite" src = "sprites/food_storage_sprite.png">
+<img id="food_storage_stage_0_sprite" src = "sprites/food_storage_st_0_sprite.png">
+<img id="food_storage_stage_1_sprite" src = "sprites/food_storage_st_1_sprite.png">
+<img id="food_storage_stage_2_sprite" src = "sprites/food_storage_st_2_sprite.png">
+
+<img id="sleeping_den_sprite" src = "sprites/sleeping_den_sprite.png">
+<img id="sleeping_den_stage_0_sprite" src = "sprites/sleeping_den_st_0_sprite.png">
+<img id="sleeping_den_stage_1_sprite" src = "sprites/sleeping_den_st_1_sprite.png">
+<img id="sleeping_den_stage_2_sprite" src = "sprites/sleeping_den_st_2_sprite.png">
+
+<img id="hungry_sprite" src= "sprites/hungry_debuff_sprite.png">
+<img id="tired_sprite" src= "sprites/tired_debuff_sprite.png">
+<img id="dirty_sprite" src= "sprites/dirty_debuff_sprite.png">
+
+
+<img id="selection_sprite" src = "sprites/selected_sprite.png">
+<img id="sleeping_den_sprite" src = "sprites/sleeping_den_sprite.png">
+
+<div id="UI">
+    <p id="fpsCounter"> FPS: </p>    
+</div>
