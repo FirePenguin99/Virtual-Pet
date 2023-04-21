@@ -87,7 +87,7 @@ function updateFrame(timeStamp) {
   // Loop through array containing all Bugs, and call their draw() method and behaviour logic.
   for (const bug of bugsList) {
     bug.draw(ctx, visualOffset);
-    bug.runBehaviourLogic(deltaTime);
+    // bug.runBehaviourLogic(deltaTime);
   }
   // Loop through array containing all Entities, and call their draw() method.
   for (const entity of entityList) {
@@ -515,6 +515,25 @@ function decreaseStatsInterval() {
   setTimeout(decreaseStatsInterval, 5000);
 }
 
+let tStamp = 0;
+let prevTime = 0;
+function update() {
+  const rate = 20;
+  for (const bug of bugsList) {
+    bug.runBehaviourLogic(rate);
+  }
+
+  tStamp = new Date().getTime();
+  const dTime = tStamp - prevTime;
+  prevTime = tStamp;
+
+  if (dTime > 20) {
+    // console.log('shitass language');
+  }
+
+  // console.log(dTime);
+}
+
 // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
 function addListeners() {
   // const feedButton = document.querySelector('#plusFood');
@@ -582,6 +601,14 @@ function startNewGame() {
 
   createNewBug(prompt("Insert new Queen's name", ''), 'queen', 0, 0);
   createNewBuilding('food_storage', 0, 100);
+  createNewBug('bloke', 'worker', 0, 0);
+  createNewBug('bloke', 'worker', 0, 0);
+  createNewBug('bloke', 'worker', 0, 0);
+  createNewBug('bloke', 'worker', 0, 0);
+  createNewBug('bloke', 'worker', 0, 0);
+  createNewBug('bloke', 'worker', 0, 0);
+  createNewBug('bloke', 'worker', 0, 0);
+
 
   localStorage.setItem('newOrLoad', null);
 }
@@ -606,4 +633,5 @@ if (localStorage.getItem('newOrLoad') === 'new') {
 
 addListeners();
 updateFrame();
+setInterval(update, 16.6666);
 decreaseStatsInterval();
