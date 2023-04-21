@@ -37,11 +37,11 @@ let previousTimeStamp = 0;
 const fpsCounter = document.querySelector('#fpsCounter');
 
 let currentObj;
-export let bugsList = [];
-export let entityList = [];
+export const bugsList = [];
+export const entityList = [];
 let bugNumber = 0;
 
-export let corpseList = [];
+export const corpseList = [];
 
 const selectEntity = new SelectionEntity();
 
@@ -585,6 +585,8 @@ function addListeners() {
 
   document.querySelector('#accept').addEventListener('click', acceptPlacement);
   document.querySelector('#cancel').addEventListener('click', cancelPlacement);
+
+  document.querySelector('#saveAndExit').addEventListener('click', saveHive);
 }
 
 function removeTenantButton(i) {
@@ -592,6 +594,32 @@ function removeTenantButton(i) {
   currentObj.removeTenant(currentObj.tenants[i]);
 }
 
+async function saveHive() {
+  const payload = {
+    id: '0004',
+    bugsList,
+    entityList,
+    bugNumber,
+    corpseList,
+  };
+  console.log('Payload', payload);
+
+  const response = await fetch('http://127.0.0.1:8080/hives', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (response.ok) {
+    exitGame();
+  } else {
+    console.log('failed to send message', response);
+  }
+}
+
+function exitGame() {
+  window.location.href = '/index.html';
+}
 
 function startNewGame() {
   createNewEntity('food', ((Math.random() * 4600) - 2300), ((Math.random() * 4600) - 2300));
@@ -615,14 +643,77 @@ function startNewGame() {
 
 function loadGame(hiveObj) {
   const hive = JSON.parse(hiveObj);
-  currentObj = hive.currentObj;
-  bugsList = hive.bugsList;
-  entityList = hive.entityList;
-  bugNumber = hive.bugNumber;
+  console.log(hive);
+  currentObj = null;
 
-  corpseList = hive.corpseList;
+  // terrible scalability, need to manually add more conditions if i were to add more bug, entity or building types
+  // what an awful, awful solution. its the only time using Classes has come back to bite me, and right at the finish line too.
+  // originally used entity = " Object.assign(Entity.prototype, entity); " which worked but i needed to get specific.
+  for (const bug of hive.bugsList) {
+    let newBug = {};
+    if (bug.type === 'queen') {
+      newBug = new Queen(bug.name, bug.x, bug.y);
+    } else {
+      newBug = new Worker(bug.name, bug.x, bug.y);
+    }
+    newBug.food = bug.food;
+    newBug.sleep = bug.sleep;
+    newBug.cleanliness = bug.cleanliness;
+    newBug.behaviour = bug.behaviour;
+    newBug.movingState = bug.movingState;
+    newBug.moveDestination = bug.moveDestination;
 
-  console.log(hive.currentObj);
+    newBug.harvestTarget = bug.harvestTarget;
+    newBug.storeTarget = bug.storeTarget;
+    newBug.foodInventory = bug.foodInventory;
+
+    newBug.isInDen = bug.isInDen;
+
+    newBug.entityTarget = bug.entityTarget;
+
+    bugsList.push(newBug);
+  }
+
+  for (const entity of hive.entityList) {
+    let newEntity = {};
+    switch (entity.type) {
+      case 'food_entity':
+        newEntity = new FoodEntity(entity.x, entity.y);
+
+        newEntity.foodInventory = entity.foodInventory;
+        break;
+      case 'gravestone_entity':
+        newEntity = new GravestoneEntity(entity.ownerBug, entity.cause);
+        break;
+      case 'food_storage':
+        newEntity = new FoodStorageBuilding(entity.x, entity.y);
+
+        newEntity.foodInventory = entity.foodInventory;
+
+        newEntity.stage = entity.stage;
+        newEntity.underConstruction = entity.underConstruction;
+        newEntity.constructionProgress = entity.constructionProgress;
+        break;
+      case 'sleeping_den':
+        newEntity = new SleepingDenBuilding(entity.x, entity.y);
+
+        newEntity.occupancy = entity.occupancy;
+        newEntity.maxOccupancy = entity.maxOccupancy;
+        newEntity.tenants = entity.tenants;
+
+        newEntity.stage = entity.stage;
+        newEntity.underConstruction = entity.underConstruction;
+        newEntity.constructionProgress = entity.constructionProgress;
+        break;
+    }
+    entityList.push(newEntity);
+  }
+
+  for (let corpse of hive.corpseList) {
+    corpse = Object.assign(CorpseEntity.prototype, corpse);
+
+    corpseList.push(corpse);
+  }
 }
 
 if (localStorage.getItem('newOrLoad') === 'new') {

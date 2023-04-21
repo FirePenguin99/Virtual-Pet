@@ -45,6 +45,12 @@ button{
     display: flex;
     position: fixed;
 }
+#saveAndExit{
+    justify-content: center;
+    display: flex;
+    position: fixed;
+    top: 90%;
+}
 
 #acceptAndCancel {
     display: flex;

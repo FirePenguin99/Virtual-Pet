@@ -1,3 +1,5 @@
+import { entityList, corpseList } from './main.mjs';
+
 export class Bug {
   constructor(name, type, spawnX, spawnY, image) {
     this.birthday = new Date();
@@ -39,7 +41,6 @@ export class Bug {
 
     this.entityTarget = null;
   }
-
 
   reduceFood() {
     this.food -= 2;
@@ -168,6 +169,14 @@ export class Bug {
     this.moveDestination.x = target.x;
     this.moveDestination.y = target.y;
     this.movingState = 'moving';
+  }
+
+  findTargetObj(targetName) {
+    for (const entity of entityList) {
+      if (targetName === entity.name) {
+        return entity;
+      }
+    }
   }
 
   setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified

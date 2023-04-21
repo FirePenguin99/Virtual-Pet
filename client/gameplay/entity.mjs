@@ -3,6 +3,7 @@ import { entityList, corpseList } from './main.mjs';
 export class Entity {
   constructor(name, spawnX, spawnY, width, height, image) {
     this.name = name;
+    this.type = 'entity';
 
     this.x = spawnX;
     this.y = spawnY;
@@ -46,7 +47,7 @@ export class FoodEntity extends Entity {
     super(spawnX, spawnY);
     this.x = spawnX;
     this.y = spawnY;
-    this.type = 1;
+    this.type = 'food_entity';
 
     this.width = 150;
     this.height = 65;
@@ -79,6 +80,7 @@ export class GravestoneEntity extends Entity {
     this.height = 30;
 
     this.name = this.ownerBug.name + "'s grave";
+    this.type = 'gravestone_entity';
 
     this.bounds = { // need to instantiate bounds as the object doesn't move, and therefore won't use the function recalcuateBounds()
       left: this.x - (this.width / 2),
@@ -219,6 +221,7 @@ export class CorpseEntity extends Entity {
     this.y = this.ownerBug.y;
 
     this.name = this.ownerBug.name + "'s corpse";
+    this.type = 'corpse_entity';
 
     this.height = 20;
     this.width = 20;

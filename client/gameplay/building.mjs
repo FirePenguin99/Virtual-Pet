@@ -63,6 +63,7 @@ export class FoodStorageBuilding extends Building {
     this.foodMax = 500;
 
     this.name = 'food storage';
+    this.type = 'food_storage';
     this.image = this.imageStages[0];
   }
 
@@ -103,6 +104,7 @@ export class SleepingDenBuilding extends Building {
     this.tenants = [];
 
     this.name = 'sleeping den';
+    this.type = 'sleeping_den';
     this.image = this.imageStages[0];
   }
 
