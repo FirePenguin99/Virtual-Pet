@@ -1,5 +1,3 @@
-import { entityList, corpseList } from './main.mjs';
-
 export class Bug {
   constructor(name, type, spawnX, spawnY, image) {
     this.birthday = new Date();
@@ -33,6 +31,7 @@ export class Bug {
     this.wanderTimer = 0;
     this.moveDestination = { x: null, y: null };
 
+    this.targetId = '';
     this.harvestTarget = null;
     this.storeTarget = null;
     this.foodInventory = 0;
@@ -169,14 +168,6 @@ export class Bug {
     this.moveDestination.x = target.x;
     this.moveDestination.y = target.y;
     this.movingState = 'moving';
-  }
-
-  findTargetObj(targetName) {
-    for (const entity of entityList) {
-      if (targetName === entity.name) {
-        return entity;
-      }
-    }
   }
 
   setBehaviour() { // first argument will always be the behaviour to set, the others will be specific parameters to the behaviour specified
@@ -318,6 +309,11 @@ export class Bug {
   }
 
   withdrawFood(amount) {
+    // when bugs are loaded from another save their target attributes are null (since JSON loses the class data of the target, therefore need to reassign)
+    if (this.harvestTarget === null) {
+      this.harvestTarget = this.findTargetObj();
+    }
+
     if (this.harvestTarget.foodInventory <= 0) {
       this.behaviour = 'wandering';
     } else {

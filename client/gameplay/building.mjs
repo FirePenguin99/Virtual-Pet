@@ -1,8 +1,9 @@
 import { Entity } from './entity.mjs';
 
 export class Building extends Entity {
-  constructor(name, spawnX, spawnY, width, height, image) {
-    super(spawnX, spawnY);
+  constructor(id, name, spawnX, spawnY, width, height, image) {
+    super(id, spawnX, spawnY);
+    this.id = id;
     this.name = name;
 
     this.x = spawnX;
@@ -13,7 +14,7 @@ export class Building extends Entity {
 
     this.image = image;
 
-    this.stage = 0;
+    this.stage = 1;
     this.imageStages = []; // stage_1, stage_2, ... , complete
 
     this.underConstruction = true;
@@ -27,17 +28,20 @@ export class Building extends Entity {
     this.constructionProgress.current += amount;
     if (this.constructionProgress.current > this.constructionProgress.complete) {
       this.underConstruction = false;
-    } else if (this.underConstruction && this.constructionProgress.current > (this.constructionProgress.complete / this.imageStages.length) * this.stage + 1) {
+    } else if (this.underConstruction && this.constructionProgress.current > (this.constructionProgress.complete / this.imageStages.length) * this.stage) {
       console.log('stage: ' + this.stage);
-      this.image = this.imageStages[this.stage];
       this.stage += 1;
+      this.image = this.imageStages[this.stage - 1];
+
+      console.log('stage: ' + this.stage);
     }
   }
 }
 
 export class FoodStorageBuilding extends Building {
-  constructor(spawnX, spawnY) {
-    super();
+  constructor(id, spawnX, spawnY) {
+    super(id);
+    this.id = id;
     this.x = spawnX;
     this.y = spawnY;
 
@@ -64,7 +68,7 @@ export class FoodStorageBuilding extends Building {
 
     this.name = 'food storage';
     this.type = 'food_storage';
-    this.image = this.imageStages[0];
+    this.image = this.imageStages[this.stage - 1];
   }
 
   increaseFood(amount) {
@@ -77,8 +81,9 @@ export class FoodStorageBuilding extends Building {
 }
 
 export class SleepingDenBuilding extends Building {
-  constructor(spawnX, spawnY) {
+  constructor(id, spawnX, spawnY) {
     super();
+    this.id = id;
     this.x = spawnX;
     this.y = spawnY;
 
@@ -105,7 +110,7 @@ export class SleepingDenBuilding extends Building {
 
     this.name = 'sleeping den';
     this.type = 'sleeping_den';
-    this.image = this.imageStages[0];
+    this.image = this.imageStages[this.stage - 1];
   }
 
   addTenant(bugObj) {

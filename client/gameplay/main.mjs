@@ -4,6 +4,14 @@ import { Building, FoodStorageBuilding, SleepingDenBuilding } from './building.m
 
 console.log(localStorage);
 // GLOBAL VARIABLES
+
+let entityNumber = 0;
+function newEntityId() {
+  const id = entityNumber;
+  entityNumber += 1;
+  return id;
+}
+
 // Variables for initialising canvas in js
 const canvas = document.querySelector('#canvas1');
 const ctx = canvas.getContext('2d');
@@ -14,18 +22,18 @@ ctx.canvas.width = document.querySelector('html').clientWidth;
 const mapImage = document.querySelector('#map');
 const mapObject = new Entity('map', 0, 0, 5000, 5000, mapImage);
 
-// variables for setting bug's behaviour to an activity (either Harvesting or Building)
+// variables for setting bug's behaviour to an activity via clicking (either Harvesting or Building)
 let toggleActivitySelecting = false;
 let currentActivity = '';
 
 const selectedForActivity = [];
 
-// variables for building placement and creation
+// variables for building placement and creation (could be seperate module)
 let buildingTemplate = null;
 let isPlacingBuilding = false;
 let isTemplateSelected = false;
 
-// Variables for mouse movement and map movement
+// Variables for mouse movement and map movement (could be seperate module?)
 let mouseHold = false;
 let canvasMousePos = { x: null, y: null };
 // setting the x and y to half the canvas' height and width makes it so the "camera" starts with (0, 0) in the game world, being in the middle of the screen
@@ -238,7 +246,7 @@ function checkBugDeath(bugObj) {
 function bugDeath(bugObj, cause) {
   const bugIndex = bugsList.indexOf(bugObj);
   console.log('Your bug: ' + bugObj.name + ' has died due to a lack of ' + cause);
-  corpseList.push(new CorpseEntity(bugObj, cause));
+  corpseList.push(new CorpseEntity(newEntityId(), bugObj, cause));
 
   bugsList.splice(bugIndex, 1);
   bugNumber += -1;
@@ -356,7 +364,7 @@ function findClosestDen() {
   }
 }
 function findClosestFood() {
-  // if already eating, then wake up
+  // if already eating, then stop eating
   if (currentObj.behaviour === 'feeding') {
     currentObj.setBehaviour('wandering');
     document.querySelector('#findFood').textContent = 'Press to send the bug to the closest food source';
@@ -386,14 +394,14 @@ function findClosestFood() {
 
 function createNewEntity(newEntityType, spawnX, spawnY) {
   if (newEntityType === 'food') {
-    entityList.push(new FoodEntity(spawnX, spawnY));
+    entityList.push(new FoodEntity(newEntityId(), spawnX, spawnY));
   }
 }
 function createNewBuilding(newBuildingType, spawnX, spawnY) {
   if (newBuildingType === 'food_storage') {
-    entityList.push(new FoodStorageBuilding(spawnX, spawnY));
+    entityList.push(new FoodStorageBuilding(newEntityId(), spawnX, spawnY));
   } else if (newBuildingType === 'sleeping_den') {
-    entityList.push(new SleepingDenBuilding(spawnX, spawnY));
+    entityList.push(new SleepingDenBuilding(newEntityId(), spawnX, spawnY));
   }
 }
 
@@ -410,9 +418,9 @@ function placeNewBuilding(newBuildingType) {
 function acceptPlacement() {
   if (buildingTemplate.canPlace) {
     if (buildingTemplate.name === 'denTemplate') {
-      entityList.push(new SleepingDenBuilding(buildingTemplate.x, buildingTemplate.y));
+      entityList.push(new SleepingDenBuilding(newEntityId(), buildingTemplate.x, buildingTemplate.y));
     } else if (buildingTemplate.name === 'storageTemplate') {
-      entityList.push(new FoodStorageBuilding(buildingTemplate.x, buildingTemplate.y));
+      entityList.push(new FoodStorageBuilding(newEntityId(), buildingTemplate.x, buildingTemplate.y));
     }
     document.querySelector('#acceptAndCancel').style.display = 'none';
     isPlacingBuilding = false;
@@ -600,6 +608,7 @@ async function saveHive() {
     bugsList,
     entityList,
     bugNumber,
+    entityNumber,
     corpseList,
   };
   console.log('Payload', payload);
@@ -641,14 +650,74 @@ function startNewGame() {
   localStorage.setItem('newOrLoad', null);
 }
 
+function findTargetById(id) {
+  for (const entity of entityList) {
+    if (id === entity.id) {
+      console.log(entity);
+      return entity;
+    }
+  }
+}
+
 function loadGame(hiveObj) {
   const hive = JSON.parse(hiveObj);
   console.log(hive);
   currentObj = null;
 
+  bugNumber = hive.bugNumber;
+  entityNumber = hive.entityNumber;
+
   // terrible scalability, need to manually add more conditions if i were to add more bug, entity or building types
   // what an awful, awful solution. its the only time using Classes has come back to bite me, and right at the finish line too.
   // originally used entity = " Object.assign(Entity.prototype, entity); " which worked but i needed to get specific.
+  for (const entity of hive.entityList) {
+    let newEntity = {};
+    switch (entity.type) {
+      case 'food_entity':
+        newEntity = new FoodEntity(entity.id, entity.x, entity.y);
+
+        newEntity.foodInventory = entity.foodInventory;
+        break;
+      case 'gravestone_entity':
+        newEntity = new GravestoneEntity(entity.ownerBug, entity.cause);
+        break;
+      case 'food_storage':
+        newEntity = new FoodStorageBuilding(entity.id, entity.x, entity.y);
+
+        newEntity.foodInventory = entity.foodInventory;
+
+        newEntity.stage = entity.stage;
+        newEntity.underConstruction = entity.underConstruction;
+        newEntity.constructionProgress = entity.constructionProgress;
+
+        newEntity.image = newEntity.imageStages[newEntity.stage - 1];
+        break;
+      case 'sleeping_den':
+        newEntity = new SleepingDenBuilding(entity.id, entity.x, entity.y);
+
+        newEntity.occupancy = entity.occupancy;
+        newEntity.maxOccupancy = entity.maxOccupancy;
+        newEntity.tenants = entity.tenants;
+
+        newEntity.stage = entity.stage;
+        newEntity.underConstruction = entity.underConstruction;
+        newEntity.constructionProgress = entity.constructionProgress;
+
+        newEntity.image = newEntity.imageStages[newEntity.stage - 1];
+        break;
+    }
+    entityList.push(newEntity);
+  }
+
+  for (const corpse of hive.corpseList) {
+    let newCorpse = {};
+
+    newCorpse = new CorpseEntity(corpse.id, corpse.ownerBug, corpse.cause);
+
+    newCorpse.cleaningProgress = corpse.cleaningProgress;
+  }
+
+  // bugs are made last as they need references to entities in entityList to do their activities, therefore entities must be made first
   for (const bug of hive.bugsList) {
     let newBug = {};
     if (bug.type === 'queen') {
@@ -671,48 +740,25 @@ function loadGame(hiveObj) {
 
     newBug.entityTarget = bug.entityTarget;
 
-    bugsList.push(newBug);
-  }
-
-  for (const entity of hive.entityList) {
-    let newEntity = {};
-    switch (entity.type) {
-      case 'food_entity':
-        newEntity = new FoodEntity(entity.x, entity.y);
-
-        newEntity.foodInventory = entity.foodInventory;
+    switch (bug.behaviour) {
+      case 'harvesting':
+        console.log(findTargetById(bug.harvestTarget.id));
+        newBug.setBehaviour(bug.behaviour, findTargetById(bug.harvestTarget.id), findTargetById(bug.storeTarget.id));
         break;
-      case 'gravestone_entity':
-        newEntity = new GravestoneEntity(entity.ownerBug, entity.cause);
+      case 'moveToFood':
+      case 'building':
+      case 'moveToDen':
+      case 'cleaning':
+        newBug.setBehaviour(bug.behaviour, findTargetById(bug.entityTarget.id));
         break;
-      case 'food_storage':
-        newEntity = new FoodStorageBuilding(entity.x, entity.y);
-
-        newEntity.foodInventory = entity.foodInventory;
-
-        newEntity.stage = entity.stage;
-        newEntity.underConstruction = entity.underConstruction;
-        newEntity.constructionProgress = entity.constructionProgress;
-        break;
-      case 'sleeping_den':
-        newEntity = new SleepingDenBuilding(entity.x, entity.y);
-
-        newEntity.occupancy = entity.occupancy;
-        newEntity.maxOccupancy = entity.maxOccupancy;
-        newEntity.tenants = entity.tenants;
-
-        newEntity.stage = entity.stage;
-        newEntity.underConstruction = entity.underConstruction;
-        newEntity.constructionProgress = entity.constructionProgress;
+      case 'sleeping':
+      case 'wandering':
+        newBug.setBehaviour(bug.behaviour);
         break;
     }
-    entityList.push(newEntity);
-  }
 
-  for (let corpse of hive.corpseList) {
-    corpse = Object.assign(CorpseEntity.prototype, corpse);
-
-    corpseList.push(corpse);
+    bugsList.push(newBug);
+    console.log('bug loaded');
   }
 }
 

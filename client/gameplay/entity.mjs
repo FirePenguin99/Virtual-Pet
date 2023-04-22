@@ -43,8 +43,9 @@ export class Entity {
 
 
 export class FoodEntity extends Entity {
-  constructor(spawnX, spawnY) {
-    super(spawnX, spawnY);
+  constructor(id, spawnX, spawnY) {
+    super(id, spawnX, spawnY);
+    this.id = id;
     this.x = spawnX;
     this.y = spawnY;
     this.type = 'food_entity';
@@ -213,8 +214,9 @@ export class TemplateBuildingEntity extends Entity {
 }
 
 export class CorpseEntity extends Entity {
-  constructor(bugObj, cause) {
-    super(bugObj, cause);
+  constructor(id, bugObj, cause) {
+    super(id, bugObj, cause);
+    this.id = id;
     this.ownerBug = bugObj;
     this.cause = cause;
     this.x = this.ownerBug.x;
