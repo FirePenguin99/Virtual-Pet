@@ -1,4 +1,5 @@
 import { Entity } from './entity.mjs';
+import { bugsList } from './main.mjs';
 
 export class Building extends Entity {
   constructor(id, name, spawnX, spawnY, width, height, image) {
@@ -113,26 +114,38 @@ export class SleepingDenBuilding extends Building {
     this.image = this.imageStages[this.stage - 1];
   }
 
-  addTenant(bugObj) {
+  addTenant(bugId) {
     if (this.occupancy === this.maxOccupancy) {
       console.log('den is full');
     } else {
-      this.tenants.push(bugObj);
+      this.tenants.push(bugId);
       this.occupancy += 1;
-      bugObj.x = 10000;
-      bugObj.y = 10000; // teleport bug far away to look like they've entered the den
-      bugObj.recalculateBounds();
-      bugObj.setBehaviour('sleeping');
+
+      // search through bugsList for the bug with the correct id
+      for (const bug of bugsList) {
+        if (bug.id === bugId) {
+          bug.x = 10000;
+          bug.y = 10000; // teleport bug far away to look like they've entered the den
+          bug.recalculateBounds();
+          bug.setBehaviour('sleeping');
+        }
+      }
     }
   }
 
-  removeTenant(bugObj) {
-    const tenantIndex = this.tenants.indexOf(bugObj);
+  removeTenant(bugId) {
+    const tenantIndex = this.tenants.indexOf(bugId);
     this.tenants.splice(tenantIndex, 1);
     this.occupancy -= 1;
-    bugObj.x = this.x;
-    bugObj.y = this.y; // teleport bug back to the den to look like they've left the den
-    bugObj.setBehaviour('wandering');
-    bugObj.isInDen = false;
+
+    // search through bugsList for the bug with the correct id
+    for (const bug of bugsList) {
+      if (bug.id === bugId) {
+        bug.x = this.x;
+        bug.y = this.y; // teleport bug back to the den to look like they've left the den
+        bug.setBehaviour('wandering');
+        bug.isInDen = false;
+      }
+    }
   }
 }

@@ -1,5 +1,8 @@
 export class Bug {
-  constructor(name, type, spawnX, spawnY, image) {
+  constructor(id, name, type, spawnX, spawnY, image) {
+    this.id = id;
+    console.log(this.id);
+
     this.birthday = new Date();
 
     this.name = name;
@@ -286,7 +289,7 @@ export class Bug {
   sleepingBehaviour() {
     if (this.sleep >= 100) { // if finished sleeping
       if (this.isInDen) { // if its in a den,
-        this.entityTarget.removeTenant(this);
+        this.entityTarget.removeTenant(this.id);
       } else { // if its sleeping on the floor,
         this.setBehaviour('wandering');
       }
@@ -305,7 +308,7 @@ export class Bug {
   }
 
   enterDen() {
-    this.entityTarget.addTenant(this);
+    this.entityTarget.addTenant(this.id);
   }
 
   withdrawFood(amount) {
@@ -344,8 +347,9 @@ export class Bug {
 }
 
 export class Queen extends Bug {
-  constructor(name, spawnX, spawnY) {
-    super(spawnX, spawnY);
+  constructor(id, name, spawnX, spawnY) {
+    super(id, spawnX, spawnY);
+    this.id = id;
     this.x = spawnX;
     this.y = spawnY;
 
@@ -360,8 +364,9 @@ export class Queen extends Bug {
 }
 
 export class Worker extends Bug {
-  constructor(name, spawnX, spawnY) {
-    super(spawnX, spawnY);
+  constructor(id, name, spawnX, spawnY) {
+    super(id, spawnX, spawnY);
+    this.id = id;
     this.x = spawnX;
     this.y = spawnY;
 

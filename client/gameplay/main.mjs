@@ -5,10 +5,17 @@ import { Building, FoodStorageBuilding, SleepingDenBuilding } from './building.m
 console.log(localStorage);
 // GLOBAL VARIABLES
 
-let entityNumber = 0;
+let entityId = 0;
 function newEntityId() {
-  const id = entityNumber;
-  entityNumber += 1;
+  const id = entityId;
+  entityId += 1;
+  return id;
+}
+
+let bugId = 0;
+function newBugId() {
+  const id = bugId;
+  bugId += 1;
   return id;
 }
 
@@ -201,9 +208,9 @@ function moveMap() {
 function createNewBug(newBugName, newBugType, x, y) {
   // create object
   if (newBugType === 'queen') {
-    bugsList.push(new Queen(newBugName, x, y));
+    bugsList.push(new Queen(newBugId(), newBugName, x, y));
   } else if (newBugType === 'worker') {
-    bugsList.push(new Worker(newBugName, x, y));
+    bugsList.push(new Worker(newBugId(), newBugName, x, y));
   }
 
   console.log(bugsList);
@@ -215,7 +222,7 @@ function spawnNewBug(newBugName) {
   if (bugsList[0].food < 50) {
     return;
   }
-  bugsList.push(new Worker(newBugName, (Math.random() * 100) - 50 + bugsList[0].x, (Math.random() * 100) - 50 + bugsList[0].y));
+  bugsList.push(new Worker(newBugId(), newBugName, (Math.random() * 100) - 50 + bugsList[0].x, (Math.random() * 100) - 50 + bugsList[0].y));
 
   console.log(bugsList);
 
@@ -604,16 +611,17 @@ function removeTenantButton(i) {
 
 async function saveHive() {
   const payload = {
-    id: '0004',
+    id: bugsList[0].name + "'s Hive",
     bugsList,
     entityList,
-    bugNumber,
-    entityNumber,
+    bugId,
+    entityId,
     corpseList,
   };
   console.log('Payload', payload);
 
-  const response = await fetch('http://127.0.0.1:8080/hives', {
+  // not sure if window.location.origin is good practice, but I couldn't find anyway to go backwards in the directory/tree.
+  const response = await fetch(window.location.origin + '/hives', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -664,8 +672,8 @@ function loadGame(hiveObj) {
   console.log(hive);
   currentObj = null;
 
-  bugNumber = hive.bugNumber;
-  entityNumber = hive.entityNumber;
+  bugId = hive.bugId;
+  entityId = hive.entityId;
 
   // terrible scalability, need to manually add more conditions if i were to add more bug, entity or building types
   // what an awful, awful solution. its the only time using Classes has come back to bite me, and right at the finish line too.
@@ -721,9 +729,9 @@ function loadGame(hiveObj) {
   for (const bug of hive.bugsList) {
     let newBug = {};
     if (bug.type === 'queen') {
-      newBug = new Queen(bug.name, bug.x, bug.y);
+      newBug = new Queen(bug.id, bug.name, bug.x, bug.y);
     } else {
-      newBug = new Worker(bug.name, bug.x, bug.y);
+      newBug = new Worker(bug.id, bug.name, bug.x, bug.y);
     }
     newBug.food = bug.food;
     newBug.sleep = bug.sleep;
