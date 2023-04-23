@@ -478,7 +478,7 @@ function UpdateStatDisplays() {
     document.querySelector('#foodDisplay').classList.remove('hidden');
     document.querySelector('#bugStats').classList.remove('hidden');
 
-    document.querySelector('#foodDisplay').textContent = 'food: ' + Math.trunc(currentObj.food);
+    document.querySelector('#foodDisplay').textContent = 'hunger: ' + Math.trunc(currentObj.food);
     document.querySelector('#cleanlinessDisplay').textContent = 'cleanliness: ' + currentObj.cleanliness;
     document.querySelector('#sleepDisplay').textContent = 'sleep: ' + currentObj.sleep;
     document.querySelector('#happinessDisplay').textContent = 'happiness: ' + Math.trunc((currentObj.food + currentObj.cleanliness + currentObj.sleep) / 3);
@@ -579,7 +579,7 @@ function addListeners() {
   document.querySelector('#accept').addEventListener('click', acceptPlacement);
   document.querySelector('#cancel').addEventListener('click', cancelPlacement);
 
-  document.querySelector('#saveAndExit').addEventListener('click', saveHive);
+  document.querySelector('#saveAndExit').addEventListener('click', saveGame);
 }
 
 function removeTenantButton(i) {
@@ -587,7 +587,7 @@ function removeTenantButton(i) {
   currentObj.removeTenant(currentObj.tenants[i]);
 }
 
-async function saveHive() {
+async function saveGame() {
   const payload = {
     id: bugsList[0].name + "'s Hive",
     bugsList,
@@ -598,7 +598,7 @@ async function saveHive() {
   };
   console.log('Payload', payload);
 
-  // not sure if window.location.origin is good practice, but I couldn't find anyway to go backwards in the directory/tree.
+  // not sure if window.location.origin is good practice, but I couldn't find any other way to go backwards in the directory/tree.
   const response = await fetch(window.location.origin + '/hives', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
