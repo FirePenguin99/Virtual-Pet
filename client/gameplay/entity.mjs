@@ -208,7 +208,6 @@ export class TemplateBuildingEntity extends Entity {
       } else {
         this.canPlace = true;
       }
-      // console.log(this.canPlace);
     }
   }
 }

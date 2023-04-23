@@ -2,7 +2,6 @@ import { Worker, Queen, Bug } from './bugs.mjs';
 import { Entity, FoodEntity, CorpseEntity, GravestoneEntity, SelectionEntity, TemplateBuildingEntity } from './entity.mjs';
 import { Building, FoodStorageBuilding, SleepingDenBuilding } from './building.mjs';
 
-console.log(localStorage);
 // GLOBAL VARIABLES
 
 let entityId = 0;
@@ -35,12 +34,12 @@ let currentActivity = '';
 
 const selectedForActivity = [];
 
-// variables for building placement and creation (could be seperate module)
+// variables for building placement and creation
 let buildingTemplate = null;
 let isPlacingBuilding = false;
 let isTemplateSelected = false;
 
-// Variables for mouse movement and map movement (could be seperate module?)
+// Variables for mouse movement and map movement
 let mouseHold = false;
 let canvasMousePos = { x: null, y: null };
 // setting the x and y to half the canvas' height and width makes it so the "camera" starts with (0, 0) in the game world, being in the middle of the screen
@@ -48,7 +47,6 @@ const visualOffset = { x: (ctx.canvas.width / 2), y: (ctx.canvas.height / 2) };
 let oldPos = null;
 
 // initialising previousTimeStamp for use in updateFrame()
-let previousTimeStamp = 0;
 const fpsCounter = document.querySelector('#fpsCounter');
 
 let currentObj;
@@ -60,13 +58,15 @@ export const corpseList = [];
 
 const selectEntity = new SelectionEntity();
 
-// function that happens every frame. timeStamp is a variable native to requestAnimationFrame function.
-function updateFrame(timeStamp) {
-  //  ---- calculate deltaTime ----
-  // This is because in the first frame the timestamp == null for some reason. Therefore when it does, just set it to what the value would approximately be so it doesn't break the rest of the code.
-  if (timeStamp == null) { timeStamp = 16.6666; }
+// function that happens every frame, this one is responsible for drawing the frame with canvas and updating the html/css UI.
+let timeStamp = 0;
+let previousTimeStamp = 0;
+function updateFrame() {
+  //  calculate deltaTime, used to be used for more but now just shows a frame rate to check performance
+  timeStamp = new Date().getTime();
   const deltaTime = timeStamp - previousTimeStamp;
   previousTimeStamp = timeStamp;
+
   fpsCounter.textContent = 'FPS: ' + Math.floor(1000 / deltaTime);
 
   //  ---- set the canvas dimensions to the dimensions of the window ----
@@ -74,6 +74,7 @@ function updateFrame(timeStamp) {
   ctx.canvas.width = document.querySelector('html').clientWidth;
 
 
+  // for map movement and moving building templates around
   if (mouseHold) {
     if (isPlacingBuilding) {
       buildingTemplate.moveAcceptCancelButtons(visualOffset);
@@ -99,12 +100,11 @@ function updateFrame(timeStamp) {
 
   selectEntity.drawSelectedObject(currentObj, ctx, visualOffset);
 
-  // Loop through array containing all Bugs, and call their draw() method and behaviour logic.
+  // the idea of the draw function was lifted from "JavaScript Game Tutorial with HTML Canvas" https://youtu.be/c-1dBd1_G8A. However the code itself is completely written by me
   for (const bug of bugsList) {
     bug.draw(ctx, visualOffset);
-    // bug.runBehaviourLogic(deltaTime);
   }
-  // Loop through array containing all Entities, and call their draw() method.
+
   for (const entity of entityList) {
     entity.draw(ctx, visualOffset);
   }
@@ -121,6 +121,15 @@ function updateFrame(timeStamp) {
   UpdateStatDisplays();
 
   requestAnimationFrame(updateFrame);
+}
+
+// function that happens every frame, this one is responsible for bug's logic execution and uses setInterval to make it work in the background
+// for some reason no matter what the interval is set to, when in the background the interval jumps to around 1000ms, so bug's actions slow down when alt-tabbed
+function updateLogic() {
+  const rate = 16.6666;
+  for (const bug of bugsList) {
+    bug.runBehaviourLogic(rate);
+  }
 }
 
 // It compares the returned value of getMousePosition to the corner co-ordinates of all bugs in the game (probably slow).
@@ -318,7 +327,7 @@ function buildingLogic() {
     toggleActivitySelecting = false;
     selectedForActivity.splice(0, selectedForActivity.length);
   } else {
-    console.log('bruh');
+    console.log('selected entity is not a building');
   }
 }
 function cleaningCorpseLogic() {
@@ -327,7 +336,7 @@ function cleaningCorpseLogic() {
     toggleActivitySelecting = false;
     selectedForActivity.splice(0, selectedForActivity.length);
   } else {
-    console.log('bruh');
+    console.log('selected entity is not a corpse');
   }
 }
 function cancelActivity() {
@@ -432,7 +441,7 @@ function acceptPlacement() {
     document.querySelector('#acceptAndCancel').style.display = 'none';
     isPlacingBuilding = false;
   } else {
-    console.log('no can do pal');
+    console.log('no can do pal, cant place building here');
   }
 }
 function cancelPlacement() {
@@ -530,40 +539,9 @@ function decreaseStatsInterval() {
   setTimeout(decreaseStatsInterval, 5000);
 }
 
-let tStamp = 0;
-let prevTime = 0;
-function update() {
-  const rate = 20;
-  for (const bug of bugsList) {
-    bug.runBehaviourLogic(rate);
-  }
-
-  tStamp = new Date().getTime();
-  const dTime = tStamp - prevTime;
-  prevTime = tStamp;
-
-  if (dTime > 20) {
-    // console.log('shitass language');
-  }
-
-  // console.log(dTime);
-}
 
 // Adds all the listeners to the elements and js variables. Event listeners usually cover user input.
 function addListeners() {
-  // const feedButton = document.querySelector('#plusFood');
-  // feedButton.addEventListener('click', () => currentObj.increaseFood(2));
-  // const cleanButton = document.querySelector('#plusClean');
-  // cleanButton.addEventListener('click', () => currentObj.increaseCleanliness(2));
-  // const sleepButton = document.querySelector('#plusSleep');
-  // sleepButton.addEventListener('click', () => currentObj.increaseSleep(2));
-  // const starveButton = document.querySelector('#subFood');
-  // starveButton.addEventListener('click', () => currentObj.reduceFood());
-  // const dirtyButton = document.querySelector('#subClean');
-  // dirtyButton.addEventListener('click', () => currentObj.reduceCleanliness());
-  // const tireButton = document.querySelector('#subSleep');
-  // tireButton.addEventListener('click', () => currentObj.reduceSleep());
-
   const newBugButton = document.querySelector('#newBug');
   newBugButton.addEventListener('click', () => spawnNewBug(prompt("Insert new bug's Name", '')));
 
@@ -646,14 +624,6 @@ function startNewGame() {
 
   createNewBug(prompt("Insert new Queen's name", ''), 'queen', 0, 0);
   createNewBuilding('food_storage', 0, 100);
-  createNewBug('bloke', 'worker', 0, 0);
-  createNewBug('bloke', 'worker', 0, 0);
-  createNewBug('bloke', 'worker', 0, 0);
-  createNewBug('bloke', 'worker', 0, 0);
-  createNewBug('bloke', 'worker', 0, 0);
-  createNewBug('bloke', 'worker', 0, 0);
-  createNewBug('bloke', 'worker', 0, 0);
-
 
   localStorage.setItem('newOrLoad', null);
 }
@@ -778,5 +748,5 @@ if (localStorage.getItem('newOrLoad') === 'new') {
 
 addListeners();
 updateFrame();
-setInterval(update, 16.6666);
+setInterval(updateLogic, 16.6666);
 decreaseStatsInterval();

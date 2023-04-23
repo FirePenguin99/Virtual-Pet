@@ -3,27 +3,6 @@ const app = express();
 app.use(express.static('client')); // this serves (hosts) a folder called client, which has its own index.html.
 
 let hives = [
-  {
-    id: '0001',
-    bugsList: ['blud', 'myMan', 'Yosei'],
-    entityList: ['house1', 'house2', 'gaff'],
-    bugNumber: 3,
-    corpseList: [],
-  },
-  {
-    id: '0002',
-    bugsList: ['blud', 'myMan', 'Yosei'],
-    entityList: ['house1', 'house2', 'gaff'],
-    bugNumber: 3,
-    corpseList: [],
-  },
-  {
-    id: '0003',
-    bugsList: ['blud', 'myMan', 'Yosei'],
-    entityList: ['house1', 'house2', 'gaff'],
-    bugNumber: 3,
-    corpseList: [],
-  },
 ];
 
 function getHives(req, res) {
