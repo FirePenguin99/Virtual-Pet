@@ -511,7 +511,12 @@ function UpdateStatDisplays() {
     for (const tenant of currentObj.tenants) { // loops through tenants in the den, and displays and updates buttons depending on the amount of tenants.
       const button = document.querySelector('#tenant_' + (currentObj.tenants.indexOf(tenant) + 1));
       button.classList.remove('hidden');
-      button.textContent = tenant.name + "'s sleep: " + tenant.sleep + '/100' + '\n' + ' Press to wake up';
+      // I really don't like looping through this array every single frame, but it needs to be done if I want to use ids (I need to since i can't save a reference to the bug object due to JSON compression when saving)
+      for (const bug of bugsList) {
+        if (bug.id === tenant) {
+          button.textContent = bug.name + "'s sleep: " + bug.sleep + '/100' + '\n' + ' Press to wake up';
+        }
+      }
     }
   }
 }

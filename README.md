@@ -1,5 +1,7 @@
 Gabriel Lewington's Virtual Pet coursework submission
 
+(if you want to restart gameplay using refresh, instead hit the back button and re-click New Hive. This happens due to the way I implemented Loading)
+
 Aim of the game is simply to manage the bugs of your Hive, starting with your Queen which can make more.
 
 Players start with a Queen and a food storage building. This building (like all buildings) needs to be constructed to be used.
